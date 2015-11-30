@@ -252,16 +252,6 @@ public class CallLogic
 		isVideoCall = false;
 	}
 
-	public boolean isNeedClearVideo()
-	{
-		return isNeedClearVideo;
-	}
-
-	public void setNeedClearVideo(boolean isNeedClearVideo)
-	{
-		this.isNeedClearVideo = isNeedClearVideo;
-	}
-
 	/*
 	 * 支持的音频路由列表
 	 */
@@ -1408,7 +1398,7 @@ public class CallLogic
 			int voipStatus = getVoipStatus();
 			if (CallStatus.STATUS_VIDEOINIT == voipStatus)
 			{
-				isNeedClearVideo = true;
+				VideoHandler.getIns().clearCallVideo();
 			}
 
 			setVoipStatus(CallStatus.STATUS_TALKING);
@@ -2110,7 +2100,8 @@ public class CallLogic
 
 				addViewToContain(remoteVV, remoteViewContain);
 				addViewToContain(localVV, localViewContain);
-			} else
+			} 
+			else
 			{
 				localVV.setZOrderMediaOverlay(false);
 				remoteVV.setZOrderMediaOverlay(true);

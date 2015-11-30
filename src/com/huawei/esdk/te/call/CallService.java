@@ -32,16 +32,16 @@ public class CallService
 		IpCallNotificationImpl.getInstance().unRegisterNotification(listener);
 	}
 
-	/**
-	 * 初始化点对点视频通话中视频数据
-	 */
-	public void initCallVideo()
-	{
-		if (!VideoHandler.getIns().isInit())
-		{
-			VideoHandler.getIns().initCallVideo();
-		}
-	}
+//	/**
+//	 * 初始化点对点视频通话中视频数据
+//	 */
+//	public void initCallVideo()
+//	{
+//		if (!VideoHandler.getIns().isInit())
+//		{
+//			VideoHandler.getIns().initCallVideo();
+//		}
+//	}
 
 	/**
 	 * 发起呼叫
@@ -103,8 +103,12 @@ public class CallService
 	 * @param preViewContain
 	 *            包含本地视频render
 	 */
-	public void addLocalRenderToContain(ViewGroup preViewContain)
+	public void openLocalPreview(ViewGroup preViewContain)
 	{
+		if (!VideoHandler.getIns().isInit())
+		{
+			VideoHandler.getIns().initCallVideo();
+		}
 		CallLogic.getInstance().addLocalRenderToContain(preViewContain);
 	}
 
@@ -118,7 +122,7 @@ public class CallService
 	 * @param isLocal
 	 *            true 本地最上面 false远端最上面
 	 */
-	public void addRenderToContain(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
+	public void openCallVideo(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
 	{
 
 		View remoteVV = VideoHandler.getIns().getRemoteCallView();
@@ -142,7 +146,7 @@ public class CallService
 	}
 
 	/**
-	 * 切换摄像头
+	 * 切换前后摄像头
 	 */
 	public boolean switchCamera()
 	{
@@ -197,14 +201,14 @@ public class CallService
 	 * @param code
 	 *            号码
 	 */
-	public boolean reDial(String code)
+	public boolean sendDTMF(String code)
 	{
 		boolean ret = CallLogic.getInstance().reDial(code);
 		return ret;
 	}
 	
 	/**
-	 * 本地麦克风静音
+	 * 静音本地麦克风
 	 * 
 	 * @param isRefer
 	 *            是否会议中转移 true: 会议中转移， false：非会议中转移，对设备原来的静音状态取反。
@@ -266,13 +270,13 @@ public class CallService
 		return CallLogic.getInstance().getCallNumber();
 	}
 
-	/**
-	 * 获取视频是否初始化
-	 */
-	public boolean isVideoInit()
-	{
-		return VideoHandler.getIns().isInit();
-	}
+//	/**
+//	 * 获取视频是否初始化
+//	 */
+//	public boolean isVideoInit()
+//	{
+//		return VideoHandler.getIns().isInit();
+//	}
 
 	/**
 	 * 获取当前通话类型

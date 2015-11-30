@@ -16,6 +16,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.huawei.application.BaseApp;
 import com.huawei.common.LogSDK;
 import com.huawei.common.Resource;
 import com.huawei.common.ThreadTimer;
