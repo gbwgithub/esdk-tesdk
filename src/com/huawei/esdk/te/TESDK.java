@@ -13,18 +13,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.huawei.application.BaseApp;
 import com.huawei.common.LogSDK;
 import com.huawei.common.Resource;
-import com.huawei.common.ThreadTimer;
 import com.huawei.ecs.mtk.log.AndroidLogger;
 import com.huawei.ecs.mtk.log.LogLevel;
 import com.huawei.ecs.mtk.log.Logger;
 import com.huawei.esdk.te.call.CallLogic;
 import com.huawei.esdk.te.data.Constants;
+import com.huawei.esdk.te.util.LayoutUtil;
+import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.manager.DataManager;
 import com.huawei.module.SDKConfigParam;
 import com.huawei.service.ServiceProxy;
@@ -65,6 +65,7 @@ public class TESDK
 	public static void initSDK(Application app)
 	{
 		instance = new TESDK(app);
+		BaseApp.setApp(app);
 	}
 
 	private TESDK(Application app)
@@ -72,14 +73,13 @@ public class TESDK
 		application = app;
 		debugSwitch = false;
 		logPath = application.getFilesDir().getPath() + SDK_LOG_DIR;
-		// LayoutUtil.getInstance().initialize();
 	}
 
 	public static TESDK getInstance()
 	{
 		if (null == instance)
 		{
-			Log.e(TAG, "TESDK didn't init");
+			LogUtil.e(TAG, "TESDK didn't init");
 		}
 		return instance;
 	}
@@ -99,13 +99,15 @@ public class TESDK
 	 */
 	public void setLogPath(boolean debugSwitch, String path)
 	{
+		//设置Log开关与路径
 		this.debugSwitch = debugSwitch;
 		this.logPath = path;
 		if (null != path && "".equals(path))
 		{
 			this.logPath = path;
 		}
-		logToFile();
+		//执行设置Log开关
+		logSwitch();
 	}
 
 	/**
@@ -117,10 +119,11 @@ public class TESDK
 	 *            日志开关
 	 * @return boolean true/ false
 	 */
-	private boolean logToFile()
+	private boolean logSwitch()
 	{
 		setFastLog(debugSwitch); // FastLog是底层的Log
 		saveLogcat(debugSwitch, logPath); // 保存LogCat日志
+		LogUtil.setLogSwitch(debugSwitch);// SDK控制台Log开关
 		return true;
 	}
 
@@ -129,14 +132,14 @@ public class TESDK
 	 */
 	private void setFastLog(boolean logSwitch)
 	{
-		Log.d(TAG, "setFastLog");
+		LogUtil.d(TAG, "setFastLog");
 		if (mService != null)
 		{
-			Log.d(TAG, "setFastLog:" + logPath);
+			LogUtil.d(TAG, "setFastLog:" + logPath);
 			mService.setLogSwitch(logPath, logSwitch);
 			return;
 		}
-		Log.d(TAG, "setFastLog Failed -> service is null.");
+		LogUtil.d(TAG, "setFastLog Failed -> service is null.");
 	}
 
 	/**
@@ -164,7 +167,7 @@ public class TESDK
 				}
 			} catch (SecurityException e)
 			{
-				Log.e(TAG, "logcat ecs error.");
+				LogUtil.e(TAG, "logcat ecs error.");
 				return;
 			}
 		}
@@ -177,12 +180,12 @@ public class TESDK
 		{
 			Logger.setLogFile(logPath + "ECS.txt");
 			Logger.setLogLevel(LogLevel.DEBUG);
-			Log.i(TAG, "set Logcat ECS DEBUG>>>>>>>>>>>>>>>");
+			LogUtil.i(TAG, "set Logcat ECS DEBUG>>>>>>>>>>>>>>>");
 		} else
 		{
 			Logger.setLogFile(logPath + "ECS.txt");
 			Logger.setLogLevel(LogLevel.INFO);
-			Log.i(TAG, "set Logcat ECS ERROR>>>>>>>>>>>>>>>");
+			LogUtil.i(TAG, "set Logcat ECS ERROR>>>>>>>>>>>>>>>");
 		}
 	}
 
@@ -242,10 +245,10 @@ public class TESDK
 	{
 		synchronized (SERVICE_LOCK)
 		{
-			Log.i(TAG, "startImServiceIfNeed enter.");
+			LogUtil.i(TAG, "startImServiceIfNeed enter.");
 			if (!mServiceStarted)
 			{
-				Log.i(TAG, ">>>>   start  eSpaceService" + " autoLogin = " + autoLogin);
+				LogUtil.i(TAG, ">>>>   start  eSpaceService" + " autoLogin = " + autoLogin);
 				Intent intent = new Intent(application, eSpaceService.class);
 				intent.putExtra(Resource.EXTRA_CHECK_AUTO_LOGIN, autoLogin);
 				application.startService(intent);
@@ -253,9 +256,9 @@ public class TESDK
 				mServiceStarted = true;
 			} else
 			{
-				Log.i(TAG, "mServiceStarted == true");
+				LogUtil.i(TAG, "mServiceStarted == true");
 			}
-			Log.i(TAG, "startImServiceIfNeed leave.");
+			LogUtil.i(TAG, "startImServiceIfNeed leave.");
 		}
 	}
 
@@ -285,90 +288,32 @@ public class TESDK
 	{
 		synchronized (SERVICE_LOCK)
 		{
-			Log.i(TAG, "stopImServiceIfInactive enter.");
+			LogUtil.i(TAG, "stopImServiceIfInactive enter.");
 
 			if (mServiceStarted)
 			{
 				if (mService != null)
 				{
-					Log.i(TAG, "   >>>>   stop  eSpaceService");
+					LogUtil.i(TAG, "   >>>>   stop  eSpaceService");
 					mService.stopService();
 					application.unbindService(mImServiceConn);
 					mService = null;
 				} else
 				{
-					Log.w(TAG, " stop  eSpaceService   mService  ==  null ");
+					LogUtil.w(TAG, " stop  eSpaceService   mService  ==  null ");
 				}
 				mServiceStarted = false;
 			} else
 			{
-				Log.w(TAG, " mServiceStarted  == false ");
+				LogUtil.w(TAG, " mServiceStarted  == false ");
 			}
 
-			Log.i(TAG, "stopImServiceIfInactive leave.");
+			LogUtil.i(TAG, "stopImServiceIfInactive leave.");
 		}
 	}
 
-	private ServiceConnection mImServiceConn = new ServiceConnection()
-	{
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service)
-		{
-			synchronized (SERVICE_LOCK)
-			{// 快速重复点击登陆取消后，出现返回到登陆界面，但实际是注册上的状态
-				Log.i(TAG, "onServiceConnected enter.");
-
-				if (mServiceStarted)
-				{
-					Log.i(TAG, "onServiceConnected () enter Thread:" + Thread.currentThread().getId());
-					mService = ((eSpaceService.ServiceBinder) service).getService();
-					mService.setSDKConfigparam(getConfigSDKParam());
-					// 开启TUP日志开关
-					setFastLog(true);
-					CallLogic CallService = new CallLogic(mService);
-					synchronized (messageQueue)
-					{
-						Message msg = null;
-						int size = messageQueue.size();
-						for (int i = 0; i < size; i++)
-						{
-							msg = messageQueue.get(i);
-							if (msg != null)
-							{
-								msg.sendToTarget();
-							}
-						}
-						messageQueue.clear();
-					}
-				}
-				// 先start，接着stop，最后才收到onServiceConnected，此时要强制stop掉
-				else
-				{
-					Log.w(TAG, "onServiceConnected service is not start, force stop Service.");
-					mServiceStarted = true;
-					mService = ((eSpaceService.ServiceBinder) service).getService();
-					mService.setSDKConfigparam(getConfigSDKParam());
-					stopSDKService();
-				}
-
-				Log.i(TAG, "onServiceConnected leave.");
-			}
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName className)
-		{
-			synchronized (SERVICE_LOCK)
-			{
-				Log.w(TAG, "onServiceDisconnected() enter Thread:" + Thread.currentThread().getId());
-				mService = null;
-			}
-		}
-	};
-
 	public void login(final LoginInfo loginInfo)
 	{
-
 		boolean isAnonymous = loginInfo.isAnonymousLogin();
 		String username = loginInfo.getLoginName();
 
@@ -402,15 +347,71 @@ public class TESDK
 					@Override
 					public void run()
 					{
-						Log.d(TAG, "ServiceConnected call connectToServer start.");
-						// false - 非匿名连接服务器
+						LogUtil.d(TAG, "ServiceConnected call connectToServer start.");
 						connectToServer(loginInfo);
-						Log.d(TAG, "ServiceConnected call connectToServer end.");
+						LogUtil.d(TAG, "ServiceConnected call connectToServer end.");
 					}
 				}, false);
 			}
 		}).run();
 	}
+
+	private ServiceConnection mImServiceConn = new ServiceConnection()
+	{
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service)
+		{
+			synchronized (SERVICE_LOCK)
+			{// 快速重复点击登陆取消后，出现返回到登陆界面，但实际是注册上的状态
+				LogUtil.i(TAG, "onServiceConnected enter.");
+
+				if (mServiceStarted)
+				{
+					LogUtil.i(TAG, "onServiceConnected () enter Thread:" + Thread.currentThread().getId());
+					mService = ((eSpaceService.ServiceBinder) service).getService();
+					mService.setSDKConfigparam(getConfigSDKParam());
+					// 开启TUP日志开关
+					setFastLog(true);
+					new CallLogic(mService);
+					synchronized (messageQueue)
+					{
+						Message msg = null;
+						int size = messageQueue.size();
+						for (int i = 0; i < size; i++)
+						{
+							msg = messageQueue.get(i);
+							if (msg != null)
+							{
+								msg.sendToTarget();
+							}
+						}
+						messageQueue.clear();
+					}
+				}
+				// 先start，接着stop，最后才收到onServiceConnected，此时要强制stop掉
+				else
+				{
+					LogUtil.w(TAG, "onServiceConnected service is not start, force stop Service.");
+					mServiceStarted = true;
+					mService = ((eSpaceService.ServiceBinder) service).getService();
+					mService.setSDKConfigparam(getConfigSDKParam());
+					stopSDKService();
+				}
+
+				LogUtil.i(TAG, "onServiceConnected leave.");
+			}
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName className)
+		{
+			synchronized (SERVICE_LOCK)
+			{
+				LogUtil.w(TAG, "onServiceDisconnected() enter Thread:" + Thread.currentThread().getId());
+				mService = null;
+			}
+		}
+	};
 
 	/**
 	 * 连接服务器 isAnonymousLogin 是否为匿名登录
@@ -419,8 +420,8 @@ public class TESDK
 	{
 		if (mService == null)
 		{
-			Log.w(TAG, "connect to Server error  serviceProxy is null ");
-			Log.i(TAG, "connectToServer leave.");
+			LogUtil.w(TAG, "connect to Server error  serviceProxy is null ");
+			LogUtil.i(TAG, "connectToServer leave.");
 			return;
 		}
 
@@ -429,7 +430,7 @@ public class TESDK
 		{
 			eSpaceService.getService().onLoginResult(State.UNREGISTE, Resource.NETWORK_INVALID);
 		}
-		Log.i(TAG, "connectToServer leave.");
+		LogUtil.i(TAG, "connectToServer leave.");
 	}
 
 	/**
@@ -455,7 +456,7 @@ public class TESDK
 		@Override
 		public void run()
 		{
-			Log.i(TAG, "logout timer begin  to logout");
+			LogUtil.i(TAG, "logout timer begin  to logout");
 			synchronized (synLock)
 			{
 				stopSDKService();
@@ -477,7 +478,7 @@ public class TESDK
 			DataManager.getIns().uninit();
 			stopSDKService();
 		}
-		Log.i(TAG, "exit app.");
+		LogUtil.i(TAG, "exit app.");
 	}
 
 }

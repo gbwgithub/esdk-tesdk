@@ -1,9 +1,5 @@
 package com.huawei.esdk.te.video;
 
-import com.huawei.esdk.te.call.CallLogic;
-import com.huawei.esdk.te.call.CallLogic;
-import com.huawei.esdk.te.data.Constants;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,11 +8,13 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+
+import com.huawei.esdk.te.call.CallLogic;
+import com.huawei.esdk.te.util.LogUtil;
 
 /**
  * 用于添加本地采集点的service 操作流程 stop-->remove-->start-->add
@@ -71,7 +69,7 @@ public class LocalHideRenderServer extends Service {
 	 */
 	@Override
 	public void onCreate() {
-		Log.d(TAG, "LocalHideRenderServer onCreate()");
+		LogUtil.d(TAG, "LocalHideRenderServer onCreate()");
 		isNeedAdd = false;
 		synchronized (LocalHideRenderServer.class) {
 			isDone = true;
@@ -92,7 +90,7 @@ public class LocalHideRenderServer extends Service {
 
 		// 大小屏切换出现花屏
 		setInstance(this);
-		Log.i(TAG, "start local hide service");
+		LogUtil.i(TAG, "start local hide service");
 		// 个别手机问题
 		// 设置屏幕亮暗
 		IntentFilter filter = new IntentFilter();
@@ -132,12 +130,12 @@ public class LocalHideRenderServer extends Service {
 				if (isNeedAdd) {
 					startCameraStream();
 				}
-				Log.i(TAG, "first add view");
+				LogUtil.i(TAG, "first add view");
 				return;
 			}
 			localHideViewGroup.removeView(viewVar);
 			mWindowManager.removeViewImmediate(localHideViewGroup);
-			Log.i(TAG, "local hide view removed");
+			LogUtil.i(TAG, "local hide view removed");
 
 			if (isNeedAdd) {
 				startCameraStream();
@@ -156,11 +154,11 @@ public class LocalHideRenderServer extends Service {
 	public void addView(View viewVar) {
 		synchronized (LocalHideRenderServer.class) {
 			if (null == viewVar) {
-				Log.i(TAG, "view is null");
+				LogUtil.i(TAG, "view is null");
 				return;
 			}
 			if (null == localHideViewGroup) {
-				Log.i(TAG, "parent is null  new a parent");
+				LogUtil.i(TAG, "parent is null  new a parent");
 				localHideViewGroup = new LinearLayout(this);
 			}
 			if (null != viewVar.getParent()) {
@@ -173,7 +171,7 @@ public class LocalHideRenderServer extends Service {
 			if (null == localHideViewGroup.getParent()) {
 				mWindowManager.addView(localHideViewGroup, wmParams);
 			}
-			Log.i(TAG, "local hide view add");
+			LogUtil.i(TAG, "local hide view add");
 			isDone = true;
 			isNeedAdd = false;
 		}
@@ -184,7 +182,7 @@ public class LocalHideRenderServer extends Service {
 	 */
 	public void stopCameraStream() {
 		synchronized (LocalHideRenderServer.class) {
-			Log.i(TAG, "stopCameraStream");
+			LogUtil.i(TAG, "stopCameraStream");
 			isDone = false;
 			CallLogic.getInstance().controlVideoCapture(false);
 		}
@@ -195,7 +193,7 @@ public class LocalHideRenderServer extends Service {
 	 */
 	public void startCameraStream() {
 		synchronized (LocalHideRenderServer.class) {
-			Log.i(TAG, "startCameraStream");
+			LogUtil.i(TAG, "startCameraStream");
 			isDone = false;
 			CallLogic.getInstance().controlVideoCapture(true);
 		}
@@ -209,7 +207,7 @@ public class LocalHideRenderServer extends Service {
 			if (null == localHideViewGroup) {
 				return;
 			}
-			Log.i(TAG, "remove local hide view");
+			LogUtil.i(TAG, "remove local hide view");
 			localHideViewGroup.removeAllViews();
 			if (null != localHideViewGroup.getParent()) {
 				mWindowManager.removeViewImmediate(localHideViewGroup);
@@ -288,7 +286,7 @@ public class LocalHideRenderServer extends Service {
 	 */
 	public void doInBackground() {
 		setBackground(true);
-		Log.d(TAG, "program run in background.");
+		LogUtil.d(TAG, "program run in background.");
 		// CommonManager.getInstance().getVoip().localCameraControl(true);
 		CallLogic.getInstance().localCameraControl(true);
 	}
@@ -302,7 +300,7 @@ public class LocalHideRenderServer extends Service {
 		}
 
 		isBackground = false;
-		Log.d(TAG, "program run from background.");
+		LogUtil.d(TAG, "program run from background.");
 		// CommonManager.getInstance().getVoip().localCameraControl(false);
 
 		CallLogic.getInstance().localCameraControl(true);
@@ -333,14 +331,14 @@ public class LocalHideRenderServer extends Service {
 	@Override
 	public void onDestroy() 
 	{
-		Log.e(TAG, "LocalHideRenderServer onDestroy()");
+		LogUtil.e(TAG, "LocalHideRenderServer onDestroy()");
 		// 只有在杀进程的时候才进强制关闭
 		// if (TESDK.getInstance().isKillPro()) {
 		// // 安卓pad发送辅流后，应用程序中的”正在运行“项停止eSpace for
 		// // TP进程，软终端自动重启登录，登录失败，需要关机后登录成功
 		if(!CallLogic.getInstance().isCallClosed())
 		{
-			Log.d(TAG, "currentCallID is not NULL ");
+			LogUtil.d(TAG, "currentCallID is not NULL ");
 			CallLogic.getInstance().forceCloseCall();
 		}
 
@@ -355,7 +353,7 @@ public class LocalHideRenderServer extends Service {
 		}
 		unregisterReceiver(mScreenReceiver);
 		this.stopSelf();
-		Log.i(TAG, "local hide service destroy");
+		LogUtil.i(TAG, "local hide service destroy");
 		if (null != instance) {
 			instance.isInit = false;
 		}
@@ -390,10 +388,10 @@ public class LocalHideRenderServer extends Service {
 			String action = intent.getAction();
 			if (Intent.ACTION_SCREEN_ON.equalsIgnoreCase(action)) {
 				isScreenOff = false;
-				Log.i(TAG, "screen has on");
+				LogUtil.i(TAG, "screen has on");
 			} else if (Intent.ACTION_BATTERY_LOW.equalsIgnoreCase(action)) {
 				int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-				Log.i(TAG, "battery warning: battery level:" + level);
+				LogUtil.i(TAG, "battery warning: battery level:" + level);
 			}
 		}
 	};

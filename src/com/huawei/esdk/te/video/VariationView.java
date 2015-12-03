@@ -4,24 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.huawei.esdk.te.call.CallLogic;
-import com.huawei.esdk.te.call.CallConstants.CallStatus;
-import com.huawei.esdk.te.data.Constants;
-import com.huawei.reader.ReaderChangeListener;
-import com.huawei.service.eSpaceService;
-import com.huawei.voip.CallManager;
-
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
+
+import com.huawei.esdk.te.call.CallConstants.CallStatus;
+import com.huawei.esdk.te.call.CallLogic;
+import com.huawei.esdk.te.util.LogUtil;
+import com.huawei.reader.ReaderChangeListener;
+import com.huawei.service.eSpaceService;
+import com.huawei.voip.CallManager;
 
 /**
  * render缩放界面
@@ -225,16 +224,16 @@ public class VariationView extends RelativeLayout
 	 */
 	private void changeRender(VariationParam param) {
 		if (CallLogic.getInstance().getVoipStatus() == CallStatus.STATUS_CLOSE) {
-			Log.d(TAG, "call has close.");
+			LogUtil.d(TAG, "call has close.");
 			return;
 		}
 		if (null == getChildAt(0)) {
-			Log.d(TAG, "render is null.");
+			LogUtil.d(TAG, "render is null.");
 			return;
 		}
 		CallManager callManager = eSpaceService.getService().callManager;
 		if (null == callManager) {
-			Log.e(TAG, "callManager is Null");
+			LogUtil.e(TAG, "callManager is Null");
 			return;
 		}
 		if (getChildAt(0) == VideoHandler.getIns().getRemoteCallView()) {
@@ -522,7 +521,7 @@ public class VariationView extends RelativeLayout
 	 */
 	public void setRenderRect(int left, int top) {
 		if (null == renderRect || null == srcBound) {
-			Log.d(TAG, "the render rect is null.");
+			LogUtil.d(TAG, "the render rect is null.");
 			return;
 		}
 		renderRect.left = left;

@@ -1,6 +1,7 @@
 package com.huawei.esdk.te.util;
 
 import com.huawei.application.BaseApp;
+import com.huawei.esdk.te.TESDK;
 import com.huawei.esdk.te.data.Constants;
 import com.huawei.utils.PlatformInfo;
 import com.huawei.voip.data.VideoCaps;
@@ -261,27 +262,27 @@ public final class LayoutUtil
 		screenWidth = screenWidthPx;
 		screenHeight = height;
 		VideoCaps.setScreenRatio(screenWidth, screenHeight);
-		Log.i(TAG, "Initialize Screen info density = " + density);
+		LogUtil.i(TAG, "Initialize Screen info density = " + density);
 
 		if (Math.abs(screenWidthPx * DENSITYDPI_REFERENCE_STANDARD - WIDTH_REFERENCE_STANDARD * density) < 0.0000001)
 		{
 			setScaleMultiple(density);
 			dpiScale = density;
-			Log.i(TAG, " Layout for normal scale screen such as MediaPad S10");
+			LogUtil.i(TAG, " Layout for normal scale screen such as MediaPad S10");
 		} else
 		{
 			setScaleMultiple(1);
 			dpiScale = 1;
-			Log.i(TAG, " Layout for PX scale screen ");
+			LogUtil.i(TAG, " Layout for PX scale screen ");
 		}
 
 		// 判断是 mobile 还是 pad 根据长边的最大 dpi 来估算， 长边dip > 900 , 认为是pad
 		if (screenWidthPx / density < 900)
 		{
-			Log.i(TAG, "Layout for mobile screen");
+			LogUtil.i(TAG, "Layout for mobile screen");
 		} else
 		{
-			Log.i(TAG, "Layout for pad screen");
+			LogUtil.i(TAG, "Layout for pad screen");
 		}
 
 		realDensity = density;
@@ -313,21 +314,22 @@ public final class LayoutUtil
 	public void initialize()
 	{
 		DisplayMetrics metric = new DisplayMetrics();
-		WindowManager wm = (WindowManager) BaseApp.getApp().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+		
+		WindowManager wm = (WindowManager) TESDK.getInstance().getApplication().getSystemService(Context.WINDOW_SERVICE);
 		wm.getDefaultDisplay().getMetrics(metric);
-		int width = metric.widthPixels; // 屏幕宽度（像素）
-		int height = metric.heightPixels; // 屏幕高度（像素）
-		float density = metric.density; // 屏幕密度（0.75 / 1.0 / 1.5）
+		int width = metric.widthPixels; 	// 屏幕宽度（像素）
+		int height = metric.heightPixels;   // 屏幕高度（像素）
+		float density = metric.density; 	// 屏幕密度（0.75 / 1.0 / 1.5）
 		this.densityDpi = metric.densityDpi; // 屏幕密度DPI（120 / 160 / 240）
 
 		// 计算屏幕尺寸，如果大于7寸当成是PAD
 		if (isPadScreen())
 		{
-			Log.i(TAG, "set pad layout: true");
+			LogUtil.i(TAG, "set pad layout: true");
 			// ConfigApp.getInstance().setUsePadLayout(true);
 		}
 
-		Log.i(TAG, metric + ",densityDpi:" + densityDpi);
+		LogUtil.i(TAG, metric + ",densityDpi:" + densityDpi);
 		// if (ConfigApp.getInstance().isUsePadLayout()) {
 		if (height > width)
 		{
@@ -362,7 +364,7 @@ public final class LayoutUtil
 		float ydpi = metric.ydpi;
 		float density = metric.density;
 		double size = Math.sqrt(Math.pow(width / xdpi, 2) + Math.pow(height / ydpi, 2));
-		Log.i(TAG, "screen size: " + size);
+		LogUtil.i(TAG, "screen size: " + size);
 		if (size > 6.600000 && Math.max(width, height) / density > 900)
 		{
 			return true;
@@ -384,7 +386,7 @@ public final class LayoutUtil
 		boolean isbool = (scaleMultiple - (-1) < 0.0001);
 		if (isbool)
 		{
-			Log.w(TAG, "ScaleMultiple " + "is been recycled, new ScaleMultiple = " + scaleMultiple);
+			LogUtil.w(TAG, "ScaleMultiple " + "is been recycled, new ScaleMultiple = " + scaleMultiple);
 		}
 		return scaleMultiple;
 	}
@@ -482,7 +484,7 @@ public final class LayoutUtil
 						text = view.getText().subSequence(0, lineEndIndex - 2) + "...";
 					} catch (IndexOutOfBoundsException e)
 					{
-						Log.d(TAG, "text size to small.");
+						LogUtil.d(TAG, "text size to small.");
 					}
 					// end modify by cwx176935 reason: DTS2014121300053
 					// 硬终端会场名称为两个汉字开始+大于17位的数字或者字母的形式，呼叫安卓mobile，安卓 mobile会自动重启
@@ -510,7 +512,7 @@ public final class LayoutUtil
 	{
 		if (null == str)
 		{
-			Log.e(TAG, "str is null");
+			LogUtil.e(TAG, "str is null");
 			return;
 		}
 		CharSequence charc = TextUtils.ellipsize(str, textView.getPaint(), len, TextUtils.TruncateAt.END);
@@ -527,8 +529,8 @@ public final class LayoutUtil
 	{
 		isPhoneTag = bPhone;
 
-		Log.i(TAG, "set is phone to " + isPhoneTag);
-		Log.i(TAG, "Build.DISPLAY : " + Build.DISPLAY);
+		LogUtil.i(TAG, "set is phone to " + isPhoneTag);
+		LogUtil.i(TAG, "Build.DISPLAY : " + Build.DISPLAY);
 	}
 
 	/**
@@ -554,7 +556,7 @@ public final class LayoutUtil
 		// {
 		// isGLSurfaceViewFlag = false;
 		// }
-		Log.i(TAG, "isGLSurfaceViewFlag : " + isGLSurfaceViewFlag);
+		LogUtil.i(TAG, "isGLSurfaceViewFlag : " + isGLSurfaceViewFlag);
 		return isGLSurfaceViewFlag;
 	}
 

@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 import android.content.Context;
 import android.hardware.Camera;
 import android.os.Handler;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import com.huawei.esdk.te.TESDK;
 import com.huawei.esdk.te.call.CallConstants.CallStatus;
 import com.huawei.esdk.te.call.CallLogic;
 import com.huawei.esdk.te.data.Constants;
+import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.esdk.te.util.OrieantationUtil;
 import com.huawei.service.eSpaceService;
 import com.huawei.utils.PlatformInfo;
@@ -188,7 +188,7 @@ final public class VideoHandler
 		}
 
 		isInit = true;
-		Log.d(TAG, "Init Call Video");
+		LogUtil.d(TAG, "Init Call Video");
 		VOIPConfigParamsData voipCfg = null;
 		if (null != eSpaceService.getService() && null != eSpaceService.getService().callManager
 				&& null != eSpaceService.getService().callManager.getVoipConfig()
@@ -262,7 +262,7 @@ final public class VideoHandler
 
 		// 初始化呼叫带宽
 		int bandWidth = Constants.CallBandWidth.CALL_BANDWIDTH_512;
-		Log.i(TAG, "initCallVideo bandWidth is " + bandWidth);
+		LogUtil.i(TAG, "initCallVideo bandWidth is " + bandWidth);
 		// videoCaps.setBandWidth(bandWidth);
 		videoCaps.setCameraIndex(cameraIndex);
 		videoCaps.setPlaybackLocal(curLocalIndex);
@@ -297,7 +297,7 @@ final public class VideoHandler
 	{
 		boolean isGLSurfaceViewFlag = true;
 		isGLSurfaceViewFlag = PlatformInfo.getAndroidVersion() >= PlatformInfo.ANDROID_VER_3_0;
-		Log.i(TAG, "isGLSurfaceViewFlag : " + isGLSurfaceViewFlag);
+		LogUtil.i(TAG, "isGLSurfaceViewFlag : " + isGLSurfaceViewFlag);
 		return isGLSurfaceViewFlag;
 	}
 
@@ -345,21 +345,21 @@ final public class VideoHandler
 		VideoCaptureDeviceInfoAndroid info = VideoCaptureDeviceInfoAndroid.CreateVideoCaptureDeviceInfoAndroid(index, context);
 		if (null == info)
 		{
-			Log.w(TAG, "get deviceInfo android is null");
+			LogUtil.w(TAG, "get deviceInfo android is null");
 			return new int[] {};
 		}
 		CaptureCapabilityAndroid[] caps = info.GetCapabilityArray(info.GetDeviceUniqueName(index));
 		if (null == caps)
 		{
-			Log.w(TAG, "capability is null");
+			LogUtil.w(TAG, "capability is null");
 			return new int[] {};
 		}
-		Log.i(TAG, "device info:" + info.GetDeviceUniqueName(index));
+		LogUtil.i(TAG, "device info:" + info.GetDeviceUniqueName(index));
 		int[] result = new int[caps.length];
 		for (int i = 0; i < caps.length; i++)
 		{
 			result[i] = caps[i].width * caps[i].height;
-			Log.i(TAG, "cameraIndex:" + index + "VRawType:" + caps[i].VRawType + ' ' + caps[i].width + '*' + caps[i].height + " MaxFps:" + caps[i].maxFPS);
+			LogUtil.i(TAG, "cameraIndex:" + index + "VRawType:" + caps[i].VRawType + ' ' + caps[i].width + '*' + caps[i].height + " MaxFps:" + caps[i].maxFPS);
 		}
 		return result;
 	}
@@ -373,7 +373,7 @@ final public class VideoHandler
 		if (frontParams.length == 0)
 		{
 			cameraCapacity.put(FRONT_CAMERA, CAMERA_NON);
-			Log.w(TAG, "can not found front camera capability");
+			LogUtil.w(TAG, "can not found front camera capability");
 		}
 
 		int[] backParams = getBackCameraInfo(context);
@@ -381,7 +381,7 @@ final public class VideoHandler
 		if (backParams.length == 0)
 		{
 			cameraCapacity.put(BACK_CAMERA, CAMERA_NON);
-			Log.w(TAG, "can not found back camera capability , set the camera switch ability false");
+			LogUtil.w(TAG, "can not found back camera capability , set the camera switch ability false");
 			return;
 		}
 
@@ -391,15 +391,15 @@ final public class VideoHandler
 			if (backParams[i] <= minParam)
 			{
 				cameraCapacity.put(BACK_CAMERA, CAMERA_NORMAL);
-				Log.i(TAG, "found min than QVGA camera can switch");
+				LogUtil.i(TAG, "found min than QVGA camera can switch");
 				return;
 			}
 		}
-		Log.i(TAG, "the phone core:" + PlatformInfo.getNumCores());
+		LogUtil.i(TAG, "the phone core:" + PlatformInfo.getNumCores());
 		if (PlatformInfo.getNumCores() == 1)
 		{
 			cameraCapacity.put(BACK_CAMERA, CAMERA_SCARCE_CAPACITY);
-			Log.w(TAG, "the min framesize more than QVGA and core is 1 so camera cannot switch");
+			LogUtil.w(TAG, "the min framesize more than QVGA and core is 1 so camera cannot switch");
 		}
 
 	}
@@ -417,13 +417,13 @@ final public class VideoHandler
 		boolean isCloseLocalCamera = videoCaps.isCloseLocalCamera();
 		if (isCloseLocalCamera)
 		{
-			Log.e(TAG, "local Cameras is closed");
+			LogUtil.e(TAG, "local Cameras is closed");
 			return false;
 		}
 
 		if (numberOfCameras <= 1)
 		{
-			Log.e(TAG, "No More Cameras");
+			LogUtil.e(TAG, "No More Cameras");
 			return false;
 		}
 
@@ -431,7 +431,7 @@ final public class VideoHandler
 		// CVoip voip = CommonManager.getInstance().getVoip();
 		if (callPresenter == null)
 		{
-			Log.e(TAG, "callPresenter Is Null");
+			LogUtil.e(TAG, "callPresenter Is Null");
 			return false;
 		}
 		cameraIndex = (cameraIndex + 1) % numberOfCameras;
@@ -448,7 +448,7 @@ final public class VideoHandler
 		// 切换摄像头
 		if (callPresenter.switchCamera(getCaps()))
 		{
-			Log.d(TAG, "Switch Success");
+			LogUtil.d(TAG, "Switch Success");
 			// 当摄像头切换时要改变这个值 不然图像首次不会校准
 			remoteTurnDirc += 1;
 			if (cameraIndex == FRONT_CAMERA)
@@ -457,7 +457,7 @@ final public class VideoHandler
 			}
 			return true;
 		}
-		Log.d(TAG, "Switch Fail");
+		LogUtil.d(TAG, "Switch Fail");
 		return false;
 	}
 
@@ -466,7 +466,7 @@ final public class VideoHandler
 	 */
 	public void clearCallVideo()
 	{
-		Log.d(TAG, "clearCallVideo() enter");
+		LogUtil.d(TAG, "clearCallVideo() enter");
 
 		uiHandler.post(new Runnable()
 		{
@@ -766,7 +766,7 @@ final public class VideoHandler
 			// remoteRect = remoteBigViewRect;
 		} else
 		{
-			Log.d(TAG, "setUseRemoteView Fail");
+			LogUtil.d(TAG, "setUseRemoteView Fail");
 			return;
 		}
 
@@ -803,12 +803,12 @@ final public class VideoHandler
 				View localHI = VideoHandler.getIns().getLocalHideView();
 				if (localHI == null)
 				{
-					Log.i(TAG, "localHI is null");
+					LogUtil.i(TAG, "localHI is null");
 					return;
 				}
 				if (null == LocalHideRenderServer.getInstance())
 				{
-					Log.i(TAG, "localHideRenderServer is null");
+					LogUtil.i(TAG, "localHideRenderServer is null");
 					return;
 				}
 				if (!isAdd)
@@ -838,7 +838,7 @@ final public class VideoHandler
 	public void changeRender()
 	{
 		// if (isChanging) {// 如果已经在改变则返回,防止出现anr
-		// Log.d(TAG, "change render not done");
+		// LogUtil.d(TAG, "change render not done");
 		// return;
 		// }
 		// isChanging = true;
@@ -861,7 +861,7 @@ final public class VideoHandler
 		// videoCaps.setPlaybackLocal(curLocalIndex);
 		// videoCaps.setPlaybackRemote(curUseRemoteRenderIndex);
 		// CommonManager.getInstance().getVoip().modifyRender(false);
-		// Log.d(TAG, "change render");
+		// LogUtil.d(TAG, "change render");
 		// isChanging = false;
 		// }
 		// });
@@ -977,7 +977,7 @@ final public class VideoHandler
 	{
 		if (null == remoteCallView)
 		{
-			Log.i(TAG, "remotecallview is null");
+			LogUtil.i(TAG, "remotecallview is null");
 			return;
 		}
 		int oldRemoteIndex = curUseRemoteRenderIndex;
@@ -990,7 +990,7 @@ final public class VideoHandler
 		remoteCallView = newSufaceView;
 		ViERenderer.setSurfaceNullFromIndex(oldRemoteIndex);
 		videoCaps.setPlaybackRemote(curUseRemoteRenderIndex);
-		Log.i(TAG, "now remote index:" + curUseRemoteRenderIndex + " clear remote index:" + oldRemoteIndex);
+		LogUtil.i(TAG, "now remote index:" + curUseRemoteRenderIndex + " clear remote index:" + oldRemoteIndex);
 	}
 
 	// 视频通话中，TE30关闭本地视频，软终端显示对端残留的最后一帧图像
@@ -1004,7 +1004,7 @@ final public class VideoHandler
 	{
 		if (null == videoView || null == videoContain)
 		{
-			Log.i(TAG, "Some Is Null");
+			LogUtil.i(TAG, "Some Is Null");
 			return;
 		}
 		ViewGroup container = (ViewGroup) videoView.getParent();
@@ -1012,16 +1012,16 @@ final public class VideoHandler
 		videoContain.removeAllViews();
 		if (null == container)
 		{
-			Log.i(TAG, "No Parent");
+			LogUtil.i(TAG, "No Parent");
 			videoContain.addView(videoView);
 		} else if (!container.equals(videoContain))
 		{
 			container.removeView(videoView);
-			Log.i(TAG, "Diferent Parent");
+			LogUtil.i(TAG, "Diferent Parent");
 			videoContain.addView(videoView);
 		} else
 		{
-			Log.i(TAG, "Same Parent");
+			LogUtil.i(TAG, "Same Parent");
 		}
 		videoContain.setVisibility(View.VISIBLE);
 		videoView.setVisibility(View.VISIBLE);

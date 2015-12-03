@@ -4,10 +4,8 @@ import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import tupsdk.TupCall;
-import android.util.Log;
 
-import com.huawei.esdk.te.video.LocalHideRenderServer;
-import com.huawei.esdk.te.video.VideoHandler;
+import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.voip.IpCallNotification;
 import com.huawei.voip.data.CameraViewRefresh;
 import com.huawei.voip.data.EventData;
@@ -31,7 +29,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 
 	public synchronized void registerNotification(CallNotification listener)
 	{
-		Log.d(TAG, "registerNotification() listener->" + listener.toString());
+		LogUtil.d(TAG, "registerNotification() listener->" + listener.toString());
 		if (listener != null && !mCallNotificationListeners.contains(listener))
 			mCallNotificationListeners.add(listener);
 	}
@@ -40,7 +38,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (listener == null)
 		{
-			Log.d(TAG, "CallManager remove all CallBack");
+			LogUtil.d(TAG, "CallManager remove all CallBack");
 			mCallNotificationListeners.clear();
 		} else
 		{
@@ -51,13 +49,13 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onAdConfirmation(AuthType authType)
 	{
-		Log.d(TAG, "IpCallNotification - onAdConfirmation() - AuthType : " + authType);
+		LogUtil.d(TAG, "IpCallNotification - onAdConfirmation() - AuthType : " + authType);
 	}
 
 	@Override
 	public void onAudioQuality(EventData eventData)
 	{
-		Log.d(TAG, "IpCallNotification - onAudioQuality()");
+		LogUtil.d(TAG, "IpCallNotification - onAudioQuality()");
 		// TODO
 		// CallActionNotifyActivty.getIns().notifyCallViewNetSigal(((VoiceQuality)
 		// eventData).getLevel());
@@ -70,7 +68,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 		// listener.onAudioQuality(eventData);
 		// } catch (Exception exception)
 		// {
-		// Log.e(TAG, "onCallViedoResult catch exception:" +
+		// LogUtil.e(TAG, "onCallViedoResult catch exception:" +
 		// exception.toString());
 		// }
 		// }
@@ -84,10 +82,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallViedoResult() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallViedoResult() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallViedoResult()");
+		LogUtil.d(TAG, "IpCallNotification - onCallViedoResult()");
 
 		CallLogic.getInstance().processCallNtfModified(sessionBean);
 
@@ -99,7 +97,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 				listener.onCallViedoResult(new Call(sessionBean));
 			} catch (Exception exception)
 			{
-				Log.e(TAG, "onCallViedoResult catch exception:" + exception.toString());
+				LogUtil.e(TAG, "onCallViedoResult catch exception:" + exception.toString());
 			}
 		}
 	}
@@ -112,10 +110,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallDelViedo() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallDelViedo() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallDelViedo()");
+		LogUtil.d(TAG, "IpCallNotification - onCallDelViedo()");
 
 		CallLogic.getInstance().processCallNtfModified(sessionBean);
 
@@ -127,7 +125,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 				listener.onCallDelViedo(new Call(sessionBean));
 			} catch (Exception exception)
 			{
-				Log.e(TAG, "onCallViedoResult catch exception:" + exception.toString());
+				LogUtil.e(TAG, "onCallViedoResult catch exception:" + exception.toString());
 			}
 		}
 	}
@@ -140,10 +138,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallAddVideo() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallAddVideo() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallAddVideo()");
+		LogUtil.d(TAG, "IpCallNotification - onCallAddVideo()");
 
 		CallLogic.getInstance().processCallNtfModifyAlert(sessionBean);
 
@@ -155,7 +153,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 				listener.onCallAddVideo(new Call(sessionBean));
 			} catch (Exception exception)
 			{
-				Log.e(TAG, "onCallViedoResult catch exception:" + exception.toString());
+				LogUtil.e(TAG, "onCallViedoResult catch exception:" + exception.toString());
 			}
 		}
 	}
@@ -165,10 +163,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onSessionModified() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onSessionModified() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onSessionModified()");
+		LogUtil.d(TAG, "IpCallNotification - onSessionModified()");
 
 		for (Iterator iterator = mCallNotificationListeners.iterator(); iterator.hasNext();)
 		{
@@ -187,10 +185,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallComing() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallComing() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallComing()");
+		LogUtil.d(TAG, "IpCallNotification - onCallComing()");
 
 		CallLogic.getInstance().processCallNtfComing(sessionBean);
 
@@ -211,10 +209,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallConnect() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallConnect() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallConnect()");
+		LogUtil.d(TAG, "IpCallNotification - onCallConnect()");
 
 		CallLogic.getInstance().processCallNtfTalk(sessionBean);
 
@@ -238,10 +236,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallDestroy() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallDestroy() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallDestroy()");
+		LogUtil.d(TAG, "IpCallNotification - onCallDestroy()");
 
 		CallLogic.getInstance().processCallNtfClosed(sessionBean);
 
@@ -265,10 +263,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallGoing() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallGoing() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallGoing()");
+		LogUtil.d(TAG, "IpCallNotification - onCallGoing()");
 		
 	}
 
@@ -278,7 +276,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onCallRefreshView(CameraViewRefresh data)
 	{
-		Log.d(TAG, "IpCallNotification - onCallRefreshView()");
+		LogUtil.d(TAG, "IpCallNotification - onCallRefreshView()");
 		
 		CallLogic.getInstance().processCallNtfRefreshView(data);
 	}
@@ -291,10 +289,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onCallend() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onCallend() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onCallend()");
+		LogUtil.d(TAG, "IpCallNotification - onCallend()");
 		
 		CallLogic.getInstance().processCallNtfEnded(sessionBean);
 
@@ -315,7 +313,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onDataReady(int callId, int bfcpRet)
 	{
-		Log.d(TAG, "IpCallNotification - onDataReady()");
+		LogUtil.d(TAG, "IpCallNotification - onDataReady()");
 		boolean isBfcpEnabled = (bfcpRet == 1 ? true : false);
 		CallLogic.getInstance().processBFCPConsultRet(callId + "", isBfcpEnabled);
 
@@ -334,14 +332,14 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onCallReferSetConfCtrlDesable()
 	{
-		Log.d(TAG, "IpCallNotification - onCallReferSetConfCtrlDesable()");
+		LogUtil.d(TAG, "IpCallNotification - onCallReferSetConfCtrlDesable()");
 	}
 
 	// BFCP（共享）
 	@Override
 	public void onDataReceiving(int callId)
 	{
-		Log.d(TAG, "IpCallNotification - onDataReceiving()");
+		LogUtil.d(TAG, "IpCallNotification - onDataReceiving()");
 		// processBFCPAccptedStart(String.valueOf(callId));
 	}
 
@@ -349,7 +347,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onDataSending(int callId)
 	{
-		Log.d(TAG, "IpCallNotification - onDataSending()");
+		LogUtil.d(TAG, "IpCallNotification - onDataSending()");
 		// processRequestBfcpResult(String.valueOf(callId), true, "");
 	}
 
@@ -357,7 +355,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onDataStartErr(int callId, int errorCode)
 	{
-		Log.d(TAG, "IpCallNotification - onDataStartErr()");
+		LogUtil.d(TAG, "IpCallNotification - onDataStartErr()");
 		// processRequestBfcpResult(String.valueOf(callId), false,
 		// String.valueOf(errorCode));
 	}
@@ -366,33 +364,33 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onDataStopped(int callId)
 	{
-		Log.d(TAG, "IpCallNotification - onDataStopped()");
+		LogUtil.d(TAG, "IpCallNotification - onDataStopped()");
 		// processBFCPStoped(String.valueOf(callId));
 	}
 
 	@Override
 	public void onDecodeSuccess(int arg0)
 	{
-		Log.d(TAG, "IpCallNotification - onDecodeSuccess()");
+		LogUtil.d(TAG, "IpCallNotification - onDecodeSuccess()");
 		// CallActionNotifyActivty.getIns().notifyDataDecodeSuccess();
 	}
 
 	@Override
 	public void onDeviceStatusChanged(DeviceStatus status)
 	{
-		Log.d(TAG, "IpCallNotification - onDeviceStatusChanged()");
+		LogUtil.d(TAG, "IpCallNotification - onDeviceStatusChanged()");
 	}
 
 	@Override
 	public void onMobileRouteChanged(TupCall arg0)
 	{
-		Log.d(TAG, "IpCallNotification - onMobileRouteChanged()");
+		LogUtil.d(TAG, "IpCallNotification - onMobileRouteChanged()");
 	}
 
 	@Override
 	public void onNotifyEnterpriseAddressBookType(boolean arg0)
 	{
-		Log.d(TAG, "IpCallNotification - onNotifyEnterpriseAddressBookType()");
+		LogUtil.d(TAG, "IpCallNotification - onNotifyEnterpriseAddressBookType()");
 	}
 
 	/**
@@ -401,7 +399,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onPasswordSuccess(int success)
 	{
-		Log.d(TAG, "IpCallNotification - onPasswordSuccess()");
+		LogUtil.d(TAG, "IpCallNotification - onPasswordSuccess()");
 	}
 
 	/**
@@ -412,10 +410,10 @@ public class IpCallNotificationImpl implements IpCallNotification
 	{
 		if (null == sessionBean)
 		{
-			Log.e(TAG, "IpCallNotification - onRingBack() error -> sessionBean is null");
+			LogUtil.e(TAG, "IpCallNotification - onRingBack() error -> sessionBean is null");
 			return;
 		}
-		Log.d(TAG, "IpCallNotification - onRingBack()");
+		LogUtil.d(TAG, "IpCallNotification - onRingBack()");
 		
 		CallLogic.getInstance().processCallNtfRinging(sessionBean);
 
@@ -434,13 +432,13 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public void onVideoQuality(EventData arg0)
 	{
-		Log.d(TAG, "IpCallNotification - onVideoQuality()");
+		LogUtil.d(TAG, "IpCallNotification - onVideoQuality()");
 	}
 
 	@Override
 	public void onVideoStatisticNetinfo(EventData arg0)
 	{
-		Log.d(TAG, "IpCallNotification - onVideoStatisticNetinfo()");
+		LogUtil.d(TAG, "IpCallNotification - onVideoStatisticNetinfo()");
 	}
 
 	/**
@@ -454,7 +452,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	@Override
 	public int reportNofitication(String comId, int funid, EventData data)
 	{
-		Log.e(TAG, "IpCallNotification - reportNofitication()");
+		LogUtil.e(TAG, "IpCallNotification - reportNofitication()");
 		return 0;
 	}
 }

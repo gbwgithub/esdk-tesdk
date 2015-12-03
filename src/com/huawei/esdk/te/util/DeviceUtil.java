@@ -3,10 +3,6 @@ package com.huawei.esdk.te.util;
 import java.io.File;
 import java.util.List;
 
-import com.huawei.esdk.te.TESDK;
-import com.huawei.esdk.te.data.Constants;
-import com.huawei.utils.StringUtil;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -21,7 +17,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+
+import com.huawei.esdk.te.TESDK;
+import com.huawei.utils.StringUtil;
 
 /**
  * 类名称：DeviceUtil.java 类描述：设备工具类
@@ -166,7 +164,7 @@ public final class DeviceUtil
 
 		if (wakeLock == null)
 		{
-			Log.i(TAG, "setKeepScreenOn() context = " + context);
+			LogUtil.i(TAG, "setKeepScreenOn() context = " + context);
 			PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 			wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
 			wakeLock.acquire();
@@ -221,7 +219,7 @@ public final class DeviceUtil
 
 	public static synchronized void releaseWakeLock()
 	{
-		Log.i(TAG, "releaseWakeLock " + wakeLock);
+		LogUtil.i(TAG, "releaseWakeLock " + wakeLock);
 		if (null != wakeLock)
 		{
 			// 设置是需要计算锁的数量，设置为false时，在release（）的时候，不管你acquire()了多少回，可以releaseWakeLock掉

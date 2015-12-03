@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import object.StreamInfo;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import com.huawei.esdk.te.call.CallConstants.CallStatus;
 import com.huawei.esdk.te.call.CallConstants.CallType;
 import com.huawei.esdk.te.data.Constants;
 import com.huawei.esdk.te.util.LayoutUtil;
+import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.esdk.te.util.MediaUtil;
 import com.huawei.esdk.te.util.OrieantationUtil;
 import com.huawei.esdk.te.video.LocalHideRenderServer;
@@ -346,10 +346,14 @@ public class CallLogic
 			if (null != callManager)
 			{
 				callManager.registerNofitication(IpCallNotificationImpl.getInstance());
+			} else
+			{
+				LogUtil.e(TAG, "callManager is null !");
+				throw new NullPointerException("callManager is null !");
 			}
 		} else
 		{
-			Log.w(TAG, "mService is null !");
+			LogUtil.e(TAG, "mService is null !");
 		}
 
 		addDefaultAudioRoute();
@@ -371,7 +375,7 @@ public class CallLogic
 	// }
 	// if (listener == null)
 	// {
-	// Log.d(TAG, "CallManager remove all CallBack");
+	// LogUtilUtil.d(TAG, "CallManager remove all CallBack");
 	// mCallNotificationListeners.clear();
 	// } else
 	// {
@@ -414,7 +418,7 @@ public class CallLogic
 		{
 			return callRet;
 		}
-		Log.i(TAG, "call ret is error");
+		LogUtil.i(TAG, "call ret is error");
 		if (isVideoCall)
 		{
 			VideoHandler.getIns().clearCallVideo();
@@ -422,10 +426,10 @@ public class CallLogic
 		// ARMv6不支持任何呼叫
 		if (CallErrorCode.CALL_ERROR_AMRV6.equals(callRet))
 		{
-			Log.e(TAG, "Your device CPU uses the ARMv6 architecture and does not support calling currently");
+			LogUtil.e(TAG, "Your device CPU uses the ARMv6 architecture and does not support calling currently");
 			return callRet;
 		}
-		Log.e(TAG, "Call failed");
+		LogUtil.e(TAG, "Call failed");
 
 		return callRet;
 	}
@@ -450,7 +454,7 @@ public class CallLogic
 
 		if (CallStatus.STATUS_CLOSE != getVoipStatus())
 		{
-			Log.e(TAG, "dialCall() failed --- getVoipStatus not in close status");
+			LogUtil.e(TAG, "dialCall() failed --- getVoipStatus not in close status");
 			return CallErrorCode.CALL_ERROR_FAILURE;
 		}
 
@@ -470,11 +474,11 @@ public class CallLogic
 		// 视频预览会产生泄漏
 		synchronized (PREVIEWLOCK)
 		{
-			Log.d(TAG, "in synchronized");
+			LogUtil.d(TAG, "in synchronized");
 		}
 
 		// 呼叫修改执行呼叫业务管理统一方法
-		Log.d(TAG, "tophone:" + fromPhone + ",domain:" + domain);
+		LogUtil.d(TAG, "tophone:" + fromPhone + ",domain:" + domain);
 		CallCommandParams params = new CallCommandParams();
 		params.setCallNumber(fromPhone);
 		params.setDomain(domain);
@@ -495,10 +499,10 @@ public class CallLogic
 		boolean isNullofCallID = (StringUtil.isStringEmpty(callid) || CallErrorCode.isFail(callid));
 		if (isNullofCallID)
 		{
-			Log.i(TAG, "diallcall excute callcommand fail!callid=" + callid);
+			LogUtil.i(TAG, "diallcall excute callcommand fail!callid=" + callid);
 			if (CallErrorCode.CALL_ERROR_IP_CHANGE.equals(callid))
 			{
-				Log.e(TAG, "CallErrorCode.CALL_ERROR_IP_CHANGE");
+				LogUtil.e(TAG, "CallErrorCode.CALL_ERROR_IP_CHANGE");
 			}
 			// 由于数据库需要来电号码作为联系人匹配，防止IP更改后的呼叫没有直接挂断的通话记录更新后没有联系人
 			setCallNumber(fromPhone);
@@ -517,7 +521,7 @@ public class CallLogic
 			curSDKCallID = currentCallID;
 
 			// callRecordMap.put(callid, recordid);
-			Log.i(TAG, "diallcall: callID=" + currentCallID + ",isVideoCall=" + isVideoCall);
+			LogUtil.i(TAG, "diallcall: callID=" + currentCallID + ",isVideoCall=" + isVideoCall);
 			return CallErrorCode.CALL_SUCCESS;
 		}
 	}
@@ -535,17 +539,17 @@ public class CallLogic
 	public synchronized boolean closeCall()
 
 	{
-		Log.i(TAG, "closeCall exec ");
+		LogUtil.i(TAG, "closeCall exec ");
 		// 解决主叫呼出快速挂断回到主界面，还有呼通响铃
 		synchronized (LOCK_CALL_OPERATION)
 		{
-			Log.i(TAG, "closeCall enter.");
+			LogUtil.i(TAG, "closeCall enter.");
 			// 当前没有会话，不执行此操作
-			Log.d(TAG, "callId->" + currentCallID);
+			LogUtil.d(TAG, "callId->" + currentCallID);
 			if (StringUtil.isStringEmpty(currentCallID))
 			{
-				Log.e(TAG, "currentCallID is null, notify call end.");
-				Log.i(TAG, "closeCall leave.");
+				LogUtil.e(TAG, "currentCallID is null, notify call end.");
+				LogUtil.i(TAG, "closeCall leave.");
 				return false;
 			}
 			MediaUtil.getIns().stopPlayer();
@@ -566,11 +570,11 @@ public class CallLogic
 			VideoHandler.getIns().resetTurnDirc();
 			// 结束后清除render.这个由界面执行完挂断后直接完成
 			String strRet = callManager.executeCallCommand(CallCommands.CALL_CMD_ENDCALL, closeParam);
-			Log.i(TAG, "hangup the call " + strRet);
+			LogUtil.i(TAG, "hangup the call " + strRet);
 			boolean bRet = parseRet(strRet);
 
-			Log.d(TAG, "closeCall 底层是否执行完成:" + bRet);
-			Log.i(TAG, "closeCall leave.");
+			LogUtil.d(TAG, "closeCall 底层是否执行完成:" + bRet);
+			LogUtil.i(TAG, "closeCall leave.");
 			return bRet;
 		}
 	}
@@ -632,7 +636,7 @@ public class CallLogic
 			callManager.operateVideoWindow(typeLocal, caps.getPlaybackLocal(), callid, VideoCaps.DISPLAY_TYPE.DISPLAY_TYPE_CLIPPING);
 			callManager.operateVideoWindow(typeRemote, caps.getPlaybackRemote(), callid, VideoCaps.DISPLAY_TYPE.DISPLAY_TYPE_BORDER);
 		}
-		Log.i(TAG, "callid:" + callid + ";callAnswer:" + ret);
+		LogUtil.i(TAG, "callid:" + callid + ";callAnswer:" + ret);
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_ANSWER, param);
 
 		this.currentCallID = callid;
@@ -648,11 +652,11 @@ public class CallLogic
 		{
 			// 主要将id置空不然这个时候去注销会出现空指针异常
 			resetData();
-			Log.e(TAG, "callAnswer failed! [callid = " + callid + "[sessionBean=" + session + ']');
+			LogUtil.e(TAG, "callAnswer failed! [callid = " + callid + "[sessionBean=" + session + ']');
 			return ret;
 		}
 		// 将状态设置改到执行完成后
-		Log.i(TAG, "session.getCallerNumber() : " + session.getCallerNumber());
+		LogUtil.i(TAG, "session.getCallerNumber() : " + session.getCallerNumber());
 		setCallNumber(session.getCallerNumber());
 		setVideoCall(isNeedAnswerVideo);
 		if (isNeedAnswerVideo)
@@ -662,7 +666,7 @@ public class CallLogic
 		{
 			setVoipStatus(CallStatus.STATUS_TALKING);
 		}
-		Log.i(TAG, "callAnswer:isvideo:" + isNeedAnswerVideo + ",callid:" + callid);
+		LogUtil.i(TAG, "callAnswer:isvideo:" + isNeedAnswerVideo + ",callid:" + callid);
 
 		return ret;
 	}
@@ -676,7 +680,7 @@ public class CallLogic
 	 */
 	public boolean rejectCall(String callid)
 	{
-		Log.d(TAG, "rejectCall()");
+		LogUtil.d(TAG, "rejectCall()");
 		boolean bRet = false;
 		if (null == callid || callid.isEmpty())
 		{
@@ -689,7 +693,7 @@ public class CallLogic
 		bRet = parseRet(sRet);
 		if (!bRet)
 		{
-			Log.e(TAG, "rejectCall failed! callid:" + callid);
+			LogUtil.e(TAG, "rejectCall failed! callid:" + callid);
 		}
 		// 来电呼叫被挂断，将来电呼叫标志位恢复
 		// isHadComingCall = false;
@@ -716,7 +720,7 @@ public class CallLogic
 		/* 将会话的视频关闭,并赋值给ret */
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_CLOSEVIDEO, params);
 		ret = parseRet(sRet);
-		Log.i(TAG, "close Video ret-> " + ret);
+		LogUtil.i(TAG, "close Video ret-> " + ret);
 
 		return ret;
 	}
@@ -754,9 +758,9 @@ public class CallLogic
 			resetAudioRoute(true);
 			// setCameraEx(VideoHandler.getIns().getCurTurnDegree(),
 			// VideoHandler.getIns().getCameraType());
-			Log.d(TAG, "agreeUpgradeVideo-->checkForAudioReNegotiate");
+			LogUtil.d(TAG, "agreeUpgradeVideo-->checkForAudioReNegotiate");
 		}
-		Log.i(TAG, "agreeUpgradeVideo:");
+		LogUtil.i(TAG, "agreeUpgradeVideo:");
 		return ret;
 	}
 
@@ -769,7 +773,7 @@ public class CallLogic
 	{
 		if (isCanceled)
 		{
-			Log.i(TAG, "disAgreeUpgradeVideo: isCanceled");
+			LogUtil.i(TAG, "disAgreeUpgradeVideo: isCanceled");
 			return false;
 		}
 
@@ -784,7 +788,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_REJECTUPDATEVIDEO, param);
 		ret = parseRet(sRet);
 		isCanceled = true;
-		Log.i(TAG, "disAgreeUpgradeVideo:");
+		LogUtil.i(TAG, "disAgreeUpgradeVideo:");
 		return ret;
 	}
 
@@ -820,7 +824,7 @@ public class CallLogic
 		/* 将会话升级为视频,并赋值给ret */
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_PDATEVIDEO, params);
 		ret = parseRet(sRet);
-		Log.i(TAG, "upgrade Video Success " + ret);
+		LogUtil.i(TAG, "upgrade Video Success " + ret);
 		if (ret)
 		{
 			setVoipStatus(CallStatus.STATUS_VIDEOINIT);
@@ -841,11 +845,11 @@ public class CallLogic
 	 */
 	public StreamInfo getMediaInfo()
 	{
-		Log.i(TAG, "getMediaInfo()");
+		LogUtil.i(TAG, "getMediaInfo()");
 
 		if (StringUtil.isStringEmpty(currentCallID))
 		{
-			Log.i(TAG, "getMediaInfo() callid is null");
+			LogUtil.i(TAG, "getMediaInfo() callid is null");
 			return null;
 		}
 
@@ -873,7 +877,7 @@ public class CallLogic
 		String exeRetString = callManager.executeCallCommand(CallCommands.CALL_CMD_REDAL, param);
 		/* 解析返回值，返回是否成功 */
 
-		Log.i(TAG, "reDial:" + code);
+		LogUtil.i(TAG, "reDial:" + code);
 
 		String SUCCESS = "0";
 		return SUCCESS.equals(exeRetString);
@@ -998,10 +1002,10 @@ public class CallLogic
 	 */
 	public boolean holdcall()
 	{
-		Log.i(TAG, "holdCall() enter");
+		LogUtil.i(TAG, "holdCall() enter");
 		if (StringUtil.isStringEmpty(currentCallID))
 		{
-			Log.e(TAG, "holdCall() callID is null");
+			LogUtil.e(TAG, "holdCall() callID is null");
 			return false;
 		}
 		// 之后增加条件判断是否能保持
@@ -1013,7 +1017,7 @@ public class CallLogic
 		CallCommandParams params = new CallCommandParams();
 		params.setCallID(currentCallID);
 		String strRet = callManager.executeCallCommand(CallCommands.CALL_CMD_HOLD, params);
-		Log.i(TAG, "holdCall() strRet:" + strRet + ", callid=" + currentCallID);
+		LogUtil.i(TAG, "holdCall() strRet:" + strRet + ", callid=" + currentCallID);
 		return true;
 	}
 
@@ -1024,10 +1028,10 @@ public class CallLogic
 	 */
 	public boolean resume()
 	{
-		Log.i(TAG, "resume() enter");
+		LogUtil.i(TAG, "resume() enter");
 		if (StringUtil.isStringEmpty(currentCallID))
 		{
-			Log.i(TAG, "holding() callid is null");
+			LogUtil.i(TAG, "holding() callid is null");
 			return false;
 		}
 		CallCommandParams param = new CallCommandParams();
@@ -1063,7 +1067,7 @@ public class CallLogic
 
 		if (StringUtil.isStringEmpty(currentCallID))
 		{
-			Log.e(TAG, "getDataFramesize() callid is null");
+			LogUtil.e(TAG, "getDataFramesize() callid is null");
 			return "1280*720";
 		}
 
@@ -1079,12 +1083,12 @@ public class CallLogic
 	 */
 	public int getMediaSEncryptState()
 	{
-		Log.i(TAG, "getMediaSEncryptState()");
+		LogUtil.i(TAG, "getMediaSEncryptState()");
 		String strResult = "";
 
 		if (StringUtil.isStringEmpty(currentCallID))
 		{
-			Log.e(TAG, "getMediaSEncryptState() callid is null");
+			LogUtil.e(TAG, "getMediaSEncryptState() callid is null");
 			return 0;
 		}
 
@@ -1118,7 +1122,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_MUTE, param);
 		/* 解析返回值返回赋值给sRet */
 		boolean bRet = parseRet(sRet);
-		Log.i(TAG, "mute ismuteAction:" + mute);
+		LogUtil.i(TAG, "mute ismuteAction:" + mute);
 		return bRet;
 	}
 
@@ -1170,7 +1174,7 @@ public class CallLogic
 	{
 		int iRet = callManager.vedioControl(StringUtil.stringToInt(currentCallID), mediaSwitch, mediaModule);
 
-		Log.i(TAG, "videoControl render:" + mediaModule + ", mediaSwitch:" + mediaSwitch + ", ret:" + iRet);
+		LogUtil.i(TAG, "videoControl render:" + mediaModule + ", mediaSwitch:" + mediaSwitch + ", ret:" + iRet);
 
 		return 0 == iRet;
 	}
@@ -1201,7 +1205,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_LOCAL_CAMERA_CONTROL, params);
 
 		boolean bRet = parseRet(sRet);
-		Log.i(TAG, "close local camera Success" + bRet);
+		LogUtil.i(TAG, "close local camera Success" + bRet);
 		return bRet;
 	}
 
@@ -1228,13 +1232,13 @@ public class CallLogic
 	{
 		if (null == caps)
 		{
-			Log.e(TAG, "caps is null!");
+			LogUtil.e(TAG, "caps is null!");
 			return false;
 		}
 		boolean callManagerAndIDStatus = (callManager == null || StringUtil.isStringEmpty(currentCallID));
 		if (callManagerAndIDStatus)
 		{
-			Log.e(TAG, "callManager or  currentCallID is null!");
+			LogUtil.e(TAG, "callManager or  currentCallID is null!");
 			return false;
 		}
 		CallCommandParams params = new CallCommandParams();
@@ -1260,7 +1264,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_OPERATE_MEDIA, param);
 
 		boolean bRet = parseRet(sRet);
-		Log.i(TAG, "startAudioChannel:" + bRet);
+		LogUtil.i(TAG, "startAudioChannel:" + bRet);
 
 		return bRet;
 	}
@@ -1279,7 +1283,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_OPERATE_MEDIA, param);
 
 		boolean bRet = parseRet(sRet);
-		Log.i(TAG, "stopAudioChannel:" + bRet);
+		LogUtil.i(TAG, "stopAudioChannel:" + bRet);
 
 		return bRet;
 	}
@@ -1297,7 +1301,7 @@ public class CallLogic
 				VideoCaps.DISPLAY_TYPE.DISPLAY_TYPE_BORDER);
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_STARTBFCP, param);
 		boolean ret = parseRet(sRet);
-		Log.i(TAG, "send aux " + ret);
+		LogUtil.i(TAG, "send aux " + ret);
 		return ret;
 	}
 
@@ -1314,7 +1318,7 @@ public class CallLogic
 		setBfcpStatus(BFCPStatus.BFCP_END);
 		boolean ret = parseRet(sRet);
 
-		Log.i(TAG, "stop aux " + ret);
+		LogUtil.i(TAG, "stop aux " + ret);
 		return ret;
 	}
 
@@ -1330,10 +1334,10 @@ public class CallLogic
 	 */
 	public void processCallNtfComing(SessionBean session)
 	{
-		Log.d(TAG, "callsession:" + session);
+		LogUtil.d(TAG, "callsession:" + session);
 		if (session == null)
 		{
-			Log.d(TAG, "seesion is null");
+			LogUtil.d(TAG, "seesion is null");
 			return;
 		}
 		comingCallID = session.getCallID();
@@ -1357,7 +1361,7 @@ public class CallLogic
 		setBfcpStatus(BFCPStatus.BFCP_END);
 		if (session == null)
 		{
-			Log.e(TAG, "processCallNtfTalk:session data is null");
+			LogUtil.e(TAG, "processCallNtfTalk:session data is null");
 			return;
 		}
 		String callid = session.getCallID();
@@ -1421,13 +1425,13 @@ public class CallLogic
 
 		if (session == null)
 		{
-			Log.e(TAG, "processCallNtfRinging:session data is null");
+			LogUtil.e(TAG, "processCallNtfRinging:session data is null");
 			return;
 		}
 
 		if (!isCurrentCall(session.getCallID()))
 		{
-			Log.e(TAG, "processCallNtfRinging fail, is not current call. curCallID: " + currentCallID + " ntfCallID: " + session.getCallID());
+			LogUtil.e(TAG, "processCallNtfRinging fail, is not current call. curCallID: " + currentCallID + " ntfCallID: " + session.getCallID());
 			return;
 		}
 	}
@@ -1437,25 +1441,25 @@ public class CallLogic
 	 */
 	public void processCallNtfEnded(SessionBean session)
 	{
-		Log.i(TAG, "processCallNtfEnded enter.");
+		LogUtil.i(TAG, "processCallNtfEnded enter.");
 		if (session == null)
 		{
-			Log.e(TAG, "session is null.");
-			Log.i(TAG, "processCallNtfEnded leave.");
+			LogUtil.e(TAG, "session is null.");
+			LogUtil.i(TAG, "processCallNtfEnded leave.");
 			return;
 		}
 		String callid = session.getCallID();
 		if (StringUtil.isStringEmpty(callid))
 		{
-			Log.e(TAG, "callid is null.");
-			Log.i(TAG, "processCallNtfEnded leave.");
+			LogUtil.e(TAG, "callid is null.");
+			LogUtil.i(TAG, "processCallNtfEnded leave.");
 			return;
 		}
-		Log.i(TAG, "processCallNtfEnded callid:" + callid);
+		LogUtil.i(TAG, "processCallNtfEnded callid:" + callid);
 		// bye原因
 		String reason = session.getReleaseReason();
-		Log.e(TAG, "onCallEnd  processCallNtfEnded()  hangup reason:" + reason);
-		Log.i(TAG, "processCallNtfEnded leave.");
+		LogUtil.e(TAG, "onCallEnd  processCallNtfEnded()  hangup reason:" + reason);
+		LogUtil.i(TAG, "processCallNtfEnded leave.");
 	}
 
 	/**
@@ -1466,22 +1470,22 @@ public class CallLogic
 	 */
 	public void processCallNtfClosed(SessionBean session)
 	{
-		Log.i(TAG, "processCallNtfClosed enter.");
+		LogUtil.i(TAG, "processCallNtfClosed enter.");
 		if (session == null)
 		{
-			Log.e(TAG, "session is null.");
-			Log.i(TAG, "processCallNtfClosed leave.");
+			LogUtil.e(TAG, "session is null.");
+			LogUtil.i(TAG, "processCallNtfClosed leave.");
 			return;
 		}
 
 		String callid = session.getCallID();
 		if (StringUtil.isStringEmpty(callid))
 		{
-			Log.e(TAG, "callid is null.");
-			Log.i(TAG, "processCallNtfClosed leave.");
+			LogUtil.e(TAG, "callid is null.");
+			LogUtil.i(TAG, "processCallNtfClosed leave.");
 			return;
 		}
-		Log.i(TAG, "processCallNtfClosed callid:" + callid);
+		LogUtil.i(TAG, "processCallNtfClosed callid:" + callid);
 
 		// 如果是当前电话 不是当前会话的在后面
 		if (isCurrentCall(callid))
@@ -1508,7 +1512,7 @@ public class CallLogic
 				{
 					delCallSessionMapByCallID(callid);
 				}
-				Log.i(TAG, "ComingCall is closed by other! callid:" + callid);
+				LogUtil.i(TAG, "ComingCall is closed by other! callid:" + callid);
 
 				// 标志位后移增加挂断时间准备，防止界面未完全挂断，多个来电界面销毁问题
 				// isHadComingCall = false;
@@ -1518,7 +1522,7 @@ public class CallLogic
 				delRecordMapBycallID(callid);
 			}
 		}
-		Log.i(TAG, "processCallNtfClosed leave.");
+		LogUtil.i(TAG, "processCallNtfClosed leave.");
 	}
 
 	/**
@@ -1529,7 +1533,7 @@ public class CallLogic
 	 */
 	public void processCallNtfModifyAlert(SessionBean session)
 	{
-		Log.d(TAG, "processCallNtfModifyAlert()");
+		LogUtil.d(TAG, "processCallNtfModifyAlert()");
 		boolean prepertyOfSessionBean = (null == session) || (!isCurrentCall(session.getCallID()));
 		if (prepertyOfSessionBean)
 		{
@@ -1553,7 +1557,7 @@ public class CallLogic
 			// 设置BFCP能力
 			setEnableBfcp(session.isBFCPSuccess());
 		}
-		Log.d(TAG, "4112 mCallSession upgrade  video call alert");
+		LogUtil.d(TAG, "4112 mCallSession upgrade  video call alert");
 	}
 
 	/**
@@ -1572,25 +1576,25 @@ public class CallLogic
 	 */
 	public void processCallNtfModified(final SessionBean currentCall)
 	{
-		Log.d(TAG, "processCallNtfModified()");
+		LogUtil.d(TAG, "processCallNtfModified()");
 		if (null == currentCall)
 		{
-			Log.d(TAG, "session is null!");
+			LogUtil.d(TAG, "session is null!");
 			return;
 		} else
 		{
 			if (!isCurrentCall(currentCall.getCallID()))
 			{
-				Log.d(TAG, "[session=" + currentCall + "] [callID=" + currentCall.getCallID() + ']');
+				LogUtil.d(TAG, "[session=" + currentCall + "] [callID=" + currentCall.getCallID() + ']');
 				return;
 			}
 		}
 		int voipStatus = getVoipStatus();
-		Log.d(TAG, "voipStatus = " + voipStatus);
+		LogUtil.d(TAG, "voipStatus = " + voipStatus);
 
 		String oper = currentCall.getOperation();
 		int videoModifyState = currentCall.getVideoModifyState();
-		Log.d(TAG, "videoModifyState = " + videoModifyState);
+		LogUtil.d(TAG, "videoModifyState = " + videoModifyState);
 
 		// 关闭视频成功 || 对端请求关闭视频
 		boolean isVideoClose = (0 == videoModifyState && CallStatus.STATUS_VIDEOING == voipStatus);
@@ -1612,7 +1616,7 @@ public class CallLogic
 		// 主动升级，会话重协商。
 		else if (isActiveUpdateVideo)
 		{
-			Log.d(TAG, "Upgrade To Video Call");
+			LogUtil.d(TAG, "Upgrade To Video Call");
 			setVoipStatus(CallStatus.STATUS_VIDEOING);
 			// resetAudioRoute(true);
 			setEnableBfcp(currentCall.isBFCPSuccess());
@@ -1630,7 +1634,7 @@ public class CallLogic
 	 */
 	public void processCallNtfRefreshView(EventData data)
 	{
-		Log.i(TAG, "refresh view()");
+		LogUtil.i(TAG, "refresh view()");
 		boolean cameraDataStatus = (null != data && data instanceof CameraViewRefresh);
 		if (cameraDataStatus)
 		{
@@ -1651,7 +1655,7 @@ public class CallLogic
 					Thread.sleep(1000);
 				} catch (InterruptedException e)
 				{
-					Log.e(TAG, "Progress get an Exception.");
+					LogUtil.e(TAG, "Progress get an Exception.");
 				}
 			}
 		}
@@ -1664,7 +1668,7 @@ public class CallLogic
 	{
 		synchronized (LocalHideRenderServer.class)
 		{
-			Log.i(TAG, "refresh_view");
+			LogUtil.i(TAG, "refresh_view");
 			VideoHandler.getIns().refreshLocalHide(isAdd);
 		}
 	}
@@ -1707,12 +1711,13 @@ public class CallLogic
 	public void clearVideoSurface()
 	{
 		int voipStatus = getVoipStatus();
-		Log.d(TAG, "clearVideoSurface() - voipStatus ->" + voipStatus);
-		boolean voipStatusIsTrue = (voipStatus == CallStatus.STATUS_VIDEOING || voipStatus == CallStatus.STATUS_VIDEOACEPT || voipStatus == CallStatus.STATUS_VIDEOINIT);
+		LogUtil.d(TAG, "clearVideoSurface() - voipStatus ->" + voipStatus);
+		boolean voipStatusIsTrue = (voipStatus == CallStatus.STATUS_VIDEOING || voipStatus == CallStatus.STATUS_VIDEOACEPT
+				|| voipStatus == CallStatus.STATUS_VIDEOINIT);
 		if (voipStatusIsTrue)
 		{
 			// 释放视频数据
-			Log.d(TAG, "clearVideoSurface() - 释放视频数据");
+			LogUtil.d(TAG, "clearVideoSurface() - 释放视频数据");
 			VideoHandler.getIns().clearCallVideo();
 		}
 	}
@@ -1772,11 +1777,11 @@ public class CallLogic
 	 */
 	public void resetAudioRoute(boolean isVideo)
 	{
-		Log.d(TAG, "resetAudioRoute");
+		LogUtil.d(TAG, "resetAudioRoute");
 		// 存在多个路由，则恢复听筒模式,此Demo不需要默认听筒模式，直接开启扬声器。。
 		// if (1 >= supportAudioRouteList.size())
 		// {
-		// Log.d(TAG, "only one route");
+		// LogUtil.d(TAG, "only one route");
 		// return;
 		// }
 
@@ -1802,7 +1807,7 @@ public class CallLogic
 				// routeCallBack.onAudioRouteSwitch(supportAudioRouteList.get(0));
 				// }
 
-				Log.i(TAG, "changed audioRoute: " + supportAudioRouteList.get(0));
+				LogUtil.i(TAG, "changed audioRoute: " + supportAudioRouteList.get(0));
 
 			}
 		}
@@ -1814,7 +1819,7 @@ public class CallLogic
 		if (callManager != null)
 		{
 			int route = callManager.getAudioRoute();
-			Log.d(TAG, "refreshAudioRoute route: " + route);
+			LogUtil.d(TAG, "refreshAudioRoute route: " + route);
 
 			// 获取音频路由只能获取到是听筒模式还是扬声器模式
 			switch (route) {
@@ -1886,7 +1891,7 @@ public class CallLogic
 			// CallActionNotifyActivty.getIns().notifyUpdateAudioRoute();
 
 			// end modify 蓝牙耳机判断调整，保持和链接状态时的判断结果一致
-			Log.i(TAG, "getAudioRoute:" + route);
+			LogUtil.i(TAG, "getAudioRoute:" + route);
 		}
 	}
 
@@ -1901,7 +1906,7 @@ public class CallLogic
 		supportAudioRouteList.add(EarpieceMode.TYPE_LOUD_SPEAKER);
 		if (null == callManager)
 		{
-			Log.e(TAG, "addDefaultAudioRoute fail. callManager is null.");
+			LogUtil.e(TAG, "addDefaultAudioRoute fail. callManager is null.");
 			return;
 		}
 
@@ -1946,12 +1951,12 @@ public class CallLogic
 	 */
 	public void forceCloseCall()
 	{
-		Log.i(TAG, "forceCloseCall exec ");
+		LogUtil.i(TAG, "forceCloseCall exec ");
 
 		// 补充，当存在主动呼出中，callSessionMap未保存记录，所以当前呼叫需要单独挂断
 		if (StringUtil.isNotEmpty(currentCallID))
 		{
-			Log.i(TAG, "forceCloseCall currentCallID");
+			LogUtil.i(TAG, "forceCloseCall currentCallID");
 			closeCall();
 		}
 		if (callSessionMap.size() <= 0)
@@ -1969,14 +1974,14 @@ public class CallLogic
 			key = itor.next();
 			if (key.equalsIgnoreCase(comingCallID))
 			{
-				Log.d(TAG, "comingCallID" + comingCallID);
+				LogUtil.d(TAG, "comingCallID" + comingCallID);
 				// 软终端建立视频通话，振铃时，软终端弹出异常退出提示，软终端一直振铃
 				MediaUtil.getIns().cancelVibrate();
 				MediaUtil.getIns().stopPlayer();
 				rejectCall(comingCallID);
 				// 在断网主动挂断时，需要主动关闭铃音并关闭来电界面
 				// 这部分以后可以提供接口给Demo，但现在只是登出操作用到此函数，暂时不用提供接口
-				// Log.d(TAG, "sendHandlerMessage to close call;callid:" +
+				// LogUtil.d(TAG, "sendHandlerMessage to close call;callid:" +
 				// comingCallID);
 				// HomeActivity.sendHandlerMessage(MSG_FOR_HOMEACTIVITY.MSG_NOTIFY_CALLCLOSE,
 				// comingCallID);
@@ -2006,7 +2011,7 @@ public class CallLogic
 		CallCommandParams parm = new CallCommandParams();
 		parm.setCallID(callid);
 		sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_ENDCALL, parm);
-		Log.i(TAG, "closeCall:" + sRet);
+		LogUtil.i(TAG, "closeCall:" + sRet);
 		delCallRecordMapByCallID(callid);
 		boolean bRet = parseRet(sRet);
 		return bRet;
@@ -2030,7 +2035,7 @@ public class CallLogic
 	{
 		if (null == videoView || null == videoContain)
 		{
-			Log.i(TAG, "addViewToContain()->Some view is Null");
+			LogUtil.i(TAG, "addViewToContain()->Some view is Null");
 			return;
 		}
 		ViewGroup container = (ViewGroup) videoView.getParent();
@@ -2038,16 +2043,16 @@ public class CallLogic
 		videoContain.removeAllViews();
 		if (null == container)
 		{
-			Log.i(TAG, "No Parent");
+			LogUtil.i(TAG, "No Parent");
 			videoContain.addView(videoView);
 		} else if (!container.equals(videoContain))
 		{
 			container.removeView(videoView);
-			Log.i(TAG, "Diferent Parent");
+			LogUtil.i(TAG, "Diferent Parent");
 			videoContain.addView(videoView);
 		} else
 		{
-			Log.i(TAG, "Same Parent");
+			LogUtil.i(TAG, "Same Parent");
 		}
 		videoContain.setVisibility(View.VISIBLE);
 		videoView.setVisibility(View.VISIBLE);
@@ -2077,7 +2082,7 @@ public class CallLogic
 	 */
 	public void addRenderToContain(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
 	{
-		Log.d(TAG, "addRenderToContain()");
+		LogUtil.d(TAG, "addRenderToContain()");
 
 		synchronized (RENDER_CHANGE_LOCK)
 		{
@@ -2100,8 +2105,7 @@ public class CallLogic
 
 				addViewToContain(remoteVV, remoteViewContain);
 				addViewToContain(localVV, localViewContain);
-			} 
-			else
+			} else
 			{
 				localVV.setZOrderMediaOverlay(false);
 				remoteVV.setZOrderMediaOverlay(true);

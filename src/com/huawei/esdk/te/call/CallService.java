@@ -1,13 +1,7 @@
 package com.huawei.esdk.te.call;
 
-import java.lang.annotation.Retention;
-
 import com.huawei.esdk.te.video.VideoHandler;
-import com.huawei.utils.StringUtil;
-import com.huawei.voip.data.CallCommandParams;
-import com.huawei.voip.data.CallCommands;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import object.StreamInfo;
@@ -228,6 +222,9 @@ public class CallService
         return CallLogic.getInstance().oratorMute(isMute);
     }
 
+    
+    
+    
 	/**
 	 * 强制关闭所有通话
 	 */

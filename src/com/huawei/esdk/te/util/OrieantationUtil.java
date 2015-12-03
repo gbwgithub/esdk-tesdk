@@ -61,10 +61,10 @@ public final class OrieantationUtil {
 			deviceReferenceAngle = cameraInfo.orientation;
 			Camera.getCameraInfo(CameraInfo.CAMERA_FACING_BACK, cameraInfo);
 			deviceBackReferenceAngle = cameraInfo.orientation;
-			Log.i(TAG, "deviceReferenceAngle:" + deviceReferenceAngle);
-			Log.i(TAG, "deviceBackReferenceAngle:" + deviceBackReferenceAngle);
+			LogUtil.i(TAG, "deviceReferenceAngle:" + deviceReferenceAngle);
+			LogUtil.i(TAG, "deviceBackReferenceAngle:" + deviceBackReferenceAngle);
 		} catch (RuntimeException e) {
-			Log.e(TAG, "getCameraInfo error");
+			LogUtil.e(TAG, "getCameraInfo error");
 		}
 	}
 
@@ -104,7 +104,7 @@ public final class OrieantationUtil {
 		// {
 		defaultVideoDisplayRotate = (defaultVideoDisplayRotate + 1) % 4;
 		// }
-		Log.i(TAG, "defaultVideoDisplayRotate is: " + defaultVideoDisplayRotate);
+		LogUtil.i(TAG, "defaultVideoDisplayRotate is: " + defaultVideoDisplayRotate);
 	}
 
 	/**

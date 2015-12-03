@@ -214,11 +214,11 @@ public final class MediaUtil
      */
     private void releaseMediaPlayer()
     {
-        Log.d(TAG, "enter releaseMediaPlayer.");
+        LogUtil.d(TAG, "enter releaseMediaPlayer.");
         
 //        if (null != executorService)
 //        {
-//            Log.d(TAG, "executorService is not null.");
+//            LogUtil.d(TAG, "executorService is not null.");
 //            getExecutorService().shutdownNow();
 //            executorService = null;
 //        }
@@ -226,28 +226,28 @@ public final class MediaUtil
         /*-------------Step:release------------*/
         synchronized (MediaUtil.class)
         {
-            Log.d(TAG, "Enter Step release.");
+            LogUtil.d(TAG, "Enter Step release.");
             if (null != mediaPlayer)
             {
-                Log.d(TAG, "enter release player.");
+                LogUtil.d(TAG, "enter release player.");
                 if (mediaPlayer.isPlaying())
                 {
-                    Log.d(TAG, "stop play.");
+                    LogUtil.d(TAG, "stop play.");
                     mediaPlayer.stop();
                 }
 
                 mediaPlayer.release();
                 mediaPlayer = null;
-                Log.d(TAG, "leave release player.");
+                LogUtil.d(TAG, "leave release player.");
             }
             else 
             {
-                Log.d(TAG, "mediaPlayer is null.");
+                LogUtil.d(TAG, "mediaPlayer is null.");
             }
-            Log.d(TAG, "Leave Step release.");
+            LogUtil.d(TAG, "Leave Step release.");
         }
         
-        Log.d(TAG, "leave releaseMediaPlayer.");
+        LogUtil.d(TAG, "leave releaseMediaPlayer.");
     }
 
 
@@ -260,7 +260,7 @@ public final class MediaUtil
      */
     private void playRing(String assetsFileName, boolean isLooping, int streamType, boolean alwaysPhonic)
     {
-        Log.d(TAG, "playRing.");
+        LogUtil.d(TAG, "playRing.");
         if (isCallPhonic() || alwaysPhonic)
         {
             AssetFileDescriptor afd = null;
@@ -276,15 +276,15 @@ public final class MediaUtil
             }
             catch(FileNotFoundException e)
             {
-                Log.e(TAG, "play ring error,no ring file.");
+                LogUtil.e(TAG, "play ring error,no ring file.");
             }
             catch (IllegalStateException e)
             {
-                Log.e(TAG, "play ring error.");
+                LogUtil.e(TAG, "play ring error.");
             }
             catch (IOException e)
             {
-                Log.e(TAG, "Progress get an Exception");
+                LogUtil.e(TAG, "Progress get an Exception");
             }
         }
     }
@@ -335,7 +335,7 @@ public final class MediaUtil
         @Override
         public void run()
         {
-            Log.d(TAG, "run.");
+            LogUtil.d(TAG, "run.");
             synchronized (MediaUtil.class)
             {
                 
@@ -343,20 +343,20 @@ public final class MediaUtil
                 {
                     return;
                 }
-                Log.d(TAG, "Enter Step Create.");
+                LogUtil.d(TAG, "Enter Step Create.");
                 if (null == mediaPlayer)
                 {
-                    Log.d(TAG, "create mediaPlayer.");
+                    LogUtil.d(TAG, "create mediaPlayer.");
                     createPlayer();
                     mediaPlayer.reset();
-                    Log.d(TAG, "create mediaPlayer ok.");
+                    LogUtil.d(TAG, "create mediaPlayer ok.");
                 }
-                Log.d(TAG, "Leave Step Create.");
-                Log.d(TAG, "Enter Step Start.");
+                LogUtil.d(TAG, "Leave Step Create.");
+                LogUtil.d(TAG, "Enter Step Start.");
                 // 已被停止，不需要进行
                 if (null == executorService)
                 {
-                    Log.w(TAG, "executorService is null. has been shutdown, release player.");
+                    LogUtil.w(TAG, "executorService is null. has been shutdown, release player.");
 //                    releaseMediaPlayer();
                     return;
                 }
@@ -372,21 +372,21 @@ public final class MediaUtil
                 }
                 catch (IllegalArgumentException e)
                 {
-                    Log.e(TAG, "error.");
+                    LogUtil.e(TAG, "error.");
                 }
                 catch (IllegalStateException e)
                 {
-                    Log.e(TAG, e.toString());
+                    LogUtil.e(TAG, e.toString());
                 }
                 catch (IOException e)
                 {
-                    Log.e(TAG, "error.");
+                    LogUtil.e(TAG, "error.");
                 }
                 
                 mediaPlayer.setLooping(isLooping);
                 mediaPlayer.start();
                 
-                Log.d(TAG, "Leave Step Start.");
+                LogUtil.d(TAG, "Leave Step Start.");
             }
             
         }
@@ -512,9 +512,9 @@ public final class MediaUtil
      */
     public synchronized void stopPlayer()
     {
-        Log.d(TAG, "Enter stopPlayer.");
+        LogUtil.d(TAG, "Enter stopPlayer.");
         releaseMediaPlayer();
-        Log.d(TAG, "Leave stopPlayer.");
+        LogUtil.d(TAG, "Leave stopPlayer.");
     }
     
 
@@ -556,7 +556,7 @@ public final class MediaUtil
         {
             return;
         }
-        Log.d(TAG, "Cancel Vibrate.");
+        LogUtil.d(TAG, "Cancel Vibrate.");
         mVibtator.cancel();
     }
 
