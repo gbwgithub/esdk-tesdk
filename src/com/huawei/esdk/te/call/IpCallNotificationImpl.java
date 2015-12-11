@@ -267,7 +267,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 			return;
 		}
 		LogUtil.d(TAG, "IpCallNotification - onCallGoing()");
-		
+
 	}
 
 	/**
@@ -277,7 +277,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 	public void onCallRefreshView(CameraViewRefresh data)
 	{
 		LogUtil.d(TAG, "IpCallNotification - onCallRefreshView()");
-		
+
 		CallLogic.getInstance().processCallNtfRefreshView(data);
 	}
 
@@ -293,7 +293,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 			return;
 		}
 		LogUtil.d(TAG, "IpCallNotification - onCallend()");
-		
+
 		CallLogic.getInstance().processCallNtfEnded(sessionBean);
 
 		for (Iterator iterator = mCallNotificationListeners.iterator(); iterator.hasNext();)
@@ -335,12 +335,43 @@ public class IpCallNotificationImpl implements IpCallNotification
 		LogUtil.d(TAG, "IpCallNotification - onCallReferSetConfCtrlDesable()");
 	}
 
-	// BFCP（共享）
+	// BFCP（共享）接收开始
 	@Override
 	public void onDataReceiving(int callId)
 	{
 		LogUtil.d(TAG, "IpCallNotification - onDataReceiving()");
-		// processBFCPAccptedStart(String.valueOf(callId));
+		CallLogic.getInstance().processBFCPAccptedStart(String.valueOf(callId));
+
+		// for (Iterator iterator = mCallNotificationListeners.iterator();
+		// iterator.hasNext();)
+		// {
+		// CallNotification listener = (CallNotification) iterator.next();
+		// try
+		// {
+		// listener.onDataReceiving(String.valueOf(callId));
+		// } catch (Exception exception)
+		// {
+		// }
+		// }
+	}
+
+	// BFCP（共享）
+	@Override
+	public void onDataStopped(int callId)
+	{
+		LogUtil.d(TAG, "IpCallNotification - onDataStopped()");
+		CallLogic.getInstance().processBFCPStoped(String.valueOf(callId));
+
+		for (Iterator iterator = mCallNotificationListeners.iterator(); iterator.hasNext();)
+		{
+			CallNotification listener = (CallNotification) iterator.next();
+			try
+			{
+				listener.onDataStopped(String.valueOf(callId));
+			} catch (Exception exception)
+			{
+			}
+		}
 	}
 
 	// BFCP（共享）
@@ -360,19 +391,21 @@ public class IpCallNotificationImpl implements IpCallNotification
 		// String.valueOf(errorCode));
 	}
 
-	// BFCP（共享）
-	@Override
-	public void onDataStopped(int callId)
-	{
-		LogUtil.d(TAG, "IpCallNotification - onDataStopped()");
-		// processBFCPStoped(String.valueOf(callId));
-	}
-
 	@Override
 	public void onDecodeSuccess(int arg0)
 	{
 		LogUtil.d(TAG, "IpCallNotification - onDecodeSuccess()");
-		// CallActionNotifyActivty.getIns().notifyDataDecodeSuccess();
+
+		for (Iterator iterator = mCallNotificationListeners.iterator(); iterator.hasNext();)
+		{
+			CallNotification listener = (CallNotification) iterator.next();
+			try
+			{
+				listener.onDataReceiving(String.valueOf(CallLogic.getInstance().getCurrentCallID()));
+			} catch (Exception exception)
+			{
+			}
+		}
 	}
 
 	@Override
@@ -414,7 +447,7 @@ public class IpCallNotificationImpl implements IpCallNotification
 			return;
 		}
 		LogUtil.d(TAG, "IpCallNotification - onRingBack()");
-		
+
 		CallLogic.getInstance().processCallNtfRinging(sessionBean);
 
 		for (Iterator iterator = mCallNotificationListeners.iterator(); iterator.hasNext();)

@@ -1,6 +1,7 @@
 package com.huawei.esdk.te.call;
 
 
+
 public interface CallNotification {
 
 	//收到来电通知
@@ -32,4 +33,11 @@ public interface CallNotification {
 
 	//响铃通知
 	public abstract void onRingBack(Call currentCall);
+	
+	
+	// BFCP（共享）接收开始
+	public abstract void onDataReceiving(String callId);
+	
+	// BFCP (共享) 结束
+	public abstract void onDataStopped(String callId);
 }

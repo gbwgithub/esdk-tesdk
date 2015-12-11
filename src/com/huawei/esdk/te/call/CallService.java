@@ -1,10 +1,12 @@
 package com.huawei.esdk.te.call;
 
-import com.huawei.esdk.te.video.VideoHandler;
+import java.util.List;
 
+import object.StreamInfo;
 import android.view.View;
 import android.view.ViewGroup;
-import object.StreamInfo;
+
+import com.huawei.esdk.te.video.VideoHandler;
 
 public class CallService
 {
@@ -25,17 +27,6 @@ public class CallService
 	{
 		IpCallNotificationImpl.getInstance().unRegisterNotification(listener);
 	}
-
-//	/**
-//	 * 初始化点对点视频通话中视频数据
-//	 */
-//	public void initCallVideo()
-//	{
-//		if (!VideoHandler.getIns().isInit())
-//		{
-//			VideoHandler.getIns().initCallVideo();
-//		}
-//	}
 
 	/**
 	 * 发起呼叫
@@ -90,7 +81,12 @@ public class CallService
 	{
 		return CallLogic.getInstance().closeCall();
 	}
-	
+
+	public boolean openBFCPReceive(ViewGroup localVideoView, ViewGroup remoteVideoView)
+	{
+		return CallLogic.getInstance().openBFCPReceive(localVideoView, remoteVideoView);
+	}
+
 	/**
 	 * 把本地视频画面添加到界面布局中
 	 * 
@@ -180,7 +176,7 @@ public class CallService
 	{
 		return CallLogic.getInstance().upgradeVideo();
 	}
-	
+
 	/**
 	 * 视频通话转音频通话
 	 */
@@ -200,7 +196,7 @@ public class CallService
 		boolean ret = CallLogic.getInstance().reDial(code);
 		return ret;
 	}
-	
+
 	/**
 	 * 静音本地麦克风
 	 * 
@@ -214,17 +210,35 @@ public class CallService
 		return CallLogic.getInstance().setLocalMute(isRefer, isMute);
 	}
 
-    /**
-     * 扬声器静音
-     */
-    public boolean oratorMute(boolean isMute)
-    {
-        return CallLogic.getInstance().oratorMute(isMute);
-    }
+	/**
+	 * 扬声器静音
+	 */
+	public boolean oratorMute(boolean isMute)
+	{
+		return CallLogic.getInstance().oratorMute(isMute);
+	}
 
-    
-    
-    
+	/**
+	 * 听筒和扬声器切换
+	 */
+	public boolean changeAudioRoute()
+	{
+		return CallLogic.getInstance().changeAudioRoute();
+	}
+
+	/**
+	 * 摄像头旋转角度设置
+	 * 
+	 * @param cameraRotation
+	 *            设置摄像头采集角度（视频捕获角度）
+	 * @param localRotation
+	 *            设置本地图像显示角度
+	 */
+	public void setCameraDegree(int cameraRotation, int localRotation)
+	{
+		CallLogic.getInstance().setCameraDegree(cameraRotation, localRotation);
+	}
+
 	/**
 	 * 强制关闭所有通话
 	 */
@@ -267,13 +281,13 @@ public class CallService
 		return CallLogic.getInstance().getCallNumber();
 	}
 
-//	/**
-//	 * 获取视频是否初始化
-//	 */
-//	public boolean isVideoInit()
-//	{
-//		return VideoHandler.getIns().isInit();
-//	}
+	/**
+	 * 获取当前支持的音频路由 第一个为正在使用的音频路由
+	 */
+	public List<Integer> getAudioRouteList()
+	{
+		return CallLogic.getInstance().getAudioRouteList();
+	}
 
 	/**
 	 * 获取当前通话类型

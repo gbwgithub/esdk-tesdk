@@ -1,11 +1,5 @@
 package com.huawei.esdk.te.util;
 
-import com.huawei.application.BaseApp;
-import com.huawei.esdk.te.TESDK;
-import com.huawei.esdk.te.data.Constants;
-import com.huawei.utils.PlatformInfo;
-import com.huawei.voip.data.VideoCaps;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -24,6 +17,11 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+
+import com.huawei.application.BaseApp;
+import com.huawei.esdk.te.TESDK;
+import com.huawei.utils.PlatformInfo;
+import com.huawei.voip.data.VideoCaps;
 
 /**
  * 定义全局的布局参数。

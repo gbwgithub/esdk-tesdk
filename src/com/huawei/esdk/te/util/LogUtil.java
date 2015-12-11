@@ -10,6 +10,8 @@ import java.util.Date;
 
 import android.util.Log;
 
+import com.huawei.esdk.te.TESDK;
+
 /**
  * 带日志文件输入的，又可控开关的日志调试
  */
@@ -22,22 +24,28 @@ public class LogUtil
 	// 输入日志类型，w代表只输出告警信息等，v代表输出所有信息
 	private static char MYLOG_TYPE = 'v';
 	// 日志文件在的路径,默认在sdcard中
-	private static String MYLOG_PATH_DIR = "/sdcard/";
+	private static String MYLOG_PATH_DIR = "/sdcard/TEMobile/log";
 	private static int SDCARD_LOG_FILE_SAVE_DAYS = 0;// sd卡中日志文件的最多保存天数
 	private static String MYLOGFILEName = "Log.txt";// 本类输出的日志文件名称
 	private static SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 日志的输出格式
 	private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-MM-dd");// 日志文件格式
 
-	public static void setLogSwitch(boolean logSwitch){
+	public static void setLogSwitch(boolean logSwitch)
+	{
 		Log.d("LogUtil", "setLogSwitch() -> " + logSwitch);
 		MYLOG_SWITCH = logSwitch;
+		if (null != TESDK.getInstance())
+		{
+			MYLOG_PATH_DIR = TESDK.getInstance().getLogPath();
+		}
 	}
-	
-	public static boolean getLogSwitch(){
+
+	public static boolean getLogSwitch()
+	{
 		Log.d("LogUtil", "getLogSwitch() -> " + MYLOG_SWITCH);
 		return MYLOG_SWITCH;
 	}
-	
+
 	public static void w(String tag, Object msg)
 	{ // 警告信息
 		log(tag, msg.toString(), 'w');
@@ -111,8 +119,10 @@ public class LogUtil
 			{
 				Log.v(tag, msg);
 			}
-			if (MYLOG_WRITE_TO_FILE)
-				writeLogtoFile(String.valueOf(level), tag, msg);
+			if (MYLOG_WRITE_TO_FILE){
+				//写入文件目前有BUG，带修复
+				//writeLogtoFile(String.valueOf(level), tag, msg);
+			}
 		}
 	}
 
@@ -125,9 +135,11 @@ public class LogUtil
 		Date nowtime = new Date();
 		String needWriteFiel = logfile.format(nowtime);
 		String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag + "    " + text;
+		d("LogUtil", "writeLogtoFile path -> " + MYLOG_PATH_DIR + "/" + needWriteFiel + MYLOGFILEName);
 		File file = new File(MYLOG_PATH_DIR, needWriteFiel + MYLOGFILEName);
 		try
 		{
+			file.setWritable(Boolean.TRUE);
 			FileWriter filerWriter = new FileWriter(file, true);// 后面这个参数代表是不是要接上文件中原来的数据，不进行覆盖
 			BufferedWriter bufWriter = new BufferedWriter(filerWriter);
 			bufWriter.write(needWriteMessage);

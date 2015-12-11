@@ -1,14 +1,12 @@
 package com.huawei.esdk.te.util;
 
-import com.huawei.application.BaseApp;
-import com.huawei.esdk.te.data.Constants;
-
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
+
+import com.huawei.application.BaseApp;
 
 /**
  * 摄像头角度调整类

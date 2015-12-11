@@ -5,16 +5,14 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.huawei.application.BaseApp;
-import com.huawei.esdk.te.data.Constants;
-
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Vibrator;
-import android.util.Log;
+
+import com.huawei.application.BaseApp;
 
 
 /**

@@ -9,11 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 import object.StreamInfo;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.huawei.application.BaseApp;
 import com.huawei.common.CallErrorCode;
 import com.huawei.esdk.te.call.CallConstants.BFCPStatus;
 import com.huawei.esdk.te.call.CallConstants.CallStatus;
@@ -257,6 +260,15 @@ public class CallLogic
 	 */
 	private List<Integer> supportAudioRouteList = new ArrayList<Integer>(0);
 
+	/**
+	 * 获取当前支持的路由 第一个为正在使用的路由
+	 */
+	public List<Integer> getAudioRouteList()
+	{
+		List<Integer> audioRouteList = new ArrayList<Integer>(supportAudioRouteList);
+		return audioRouteList;
+	}
+
 	// 用于保存callid和callsession对应MAP
 	private HashMap<String, SessionBean> callSessionMap = new HashMap<String, SessionBean>(0);
 
@@ -268,21 +280,6 @@ public class CallLogic
 	public String getCurrentCallID()
 	{
 		return currentCallID;
-	}
-
-	/**
-	 * 用于SDK对外提供currentCallID使用，由外部负责管理
-	 */
-	private String curSDKCallID = null;
-
-	public String getCurSDKCallID()
-	{
-		return curSDKCallID;
-	}
-
-	public void setCurSDKCallID(String curSDKCallID)
-	{
-		this.curSDKCallID = curSDKCallID;
 	}
 
 	// 增加用于保存呼叫进来的ID
@@ -357,7 +354,6 @@ public class CallLogic
 		}
 
 		addDefaultAudioRoute();
-
 	}
 
 	// public synchronized void registerNotification(CallNotification listener)
@@ -518,8 +514,6 @@ public class CallLogic
 
 			// 设置呼出成功的callid为当前操作的会话
 			this.currentCallID = callid;
-			curSDKCallID = currentCallID;
-
 			// callRecordMap.put(callid, recordid);
 			LogUtil.i(TAG, "diallcall: callID=" + currentCallID + ",isVideoCall=" + isVideoCall);
 			return CallErrorCode.CALL_SUCCESS;
@@ -640,7 +634,6 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_ANSWER, param);
 
 		this.currentCallID = callid;
-		curSDKCallID = this.currentCallID;
 		SessionBean session = callSessionMap.get(callid);
 		// 接听来电后将来电标志位重置
 		// isHadComingCall = false;
@@ -735,6 +728,8 @@ public class CallLogic
 	public boolean agreeUpgradeVideo()
 	{
 		VideoCaps caps = (VideoCaps) VideoHandler.getIns().initCallVideo();
+		Toast.makeText(BaseApp.getApp(), "getCameraRotation -> " + caps.getCameraRotation(), Toast.LENGTH_LONG).show();
+		LogUtil.d(TAG, "getCameraRotation -> " + caps.getCameraRotation());
 		VideoCaps dataCaps = VideoHandler.getIns().getDataCaps();
 
 		boolean ret = false;
@@ -939,6 +934,25 @@ public class CallLogic
 		caps.setRemoteRoate(orientation == 1 ? 2 : 0);
 		params.setCaps(caps);
 		params.setCallID(currentCallID);
+		callManager.executeCallCommand(CallCommands.CALL_CMD_CAMERA_ROTATION, params);
+	}
+	
+	/**
+	 * 摄像头旋转角度设置
+	 * @param cameraRotation 设置摄像头采集角度（视频捕获角度）
+	 * @param localRotation 设置本地图像显示角度
+	 */
+	public void setCameraDegree(int cameraRotation, int localRotation)
+	{
+		CallCommandParams params = new CallCommandParams();
+
+		VideoCaps caps = VideoHandler.getIns().getCaps();
+		caps.setCameraRotation(cameraRotation % 4);
+		caps.setLocalRoate(localRotation % 4);
+
+		params.setCaps(caps);
+		params.setCallID(currentCallID);
+
 		callManager.executeCallCommand(CallCommands.CALL_CMD_CAMERA_ROTATION, params);
 	}
 
@@ -1701,6 +1715,43 @@ public class CallLogic
 		}
 	}
 
+	/**
+	 * BFCP接收开始
+	 * 
+	 * @param callid
+	 *            呼叫唯一标识
+	 */
+	public void processBFCPAccptedStart(String callid)
+	{
+		// notice the GUI BFCP begin
+		LogUtil.i(TAG, " BFCP start accpted,callid=" + callid);
+		setBfcpStatus(BFCPStatus.BFCP_RECEIVE);
+		if (CallStatus.STATUS_TALKING == getVoipStatus())
+		{
+			// 正在语音通话中，不支持辅流（要视频通话）
+			Log.e(TAG, "CallStatus is Status_TALKING, notice whether the BFCP is available or not.");
+			// return;
+		}
+	}
+
+	/**
+	 * BFCP接收结束
+	 * 
+	 * @param callid
+	 *            呼叫唯一标识
+	 */
+	public void processBFCPStoped(String callid)
+	{
+		if (null != callid && !callid.equals(getCurrentCallID()))
+		{
+			LogUtil.d(TAG, "stop bfcp recevice do non because callid != currentCallId");
+			return;
+		}
+		// notice the GUI side the bfcp is stoped
+		setBfcpStatus(BFCPStatus.BFCP_END);
+		LogUtil.i(TAG, " BFCP is stoped,callid=" + callid);
+	}
+
 	/*******************************************************************
 	 * 处理由SDK层上报的事件finish
 	 *******************************************************************/
@@ -1712,8 +1763,7 @@ public class CallLogic
 	{
 		int voipStatus = getVoipStatus();
 		LogUtil.d(TAG, "clearVideoSurface() - voipStatus ->" + voipStatus);
-		boolean voipStatusIsTrue = (voipStatus == CallStatus.STATUS_VIDEOING || voipStatus == CallStatus.STATUS_VIDEOACEPT
-				|| voipStatus == CallStatus.STATUS_VIDEOINIT);
+		boolean voipStatusIsTrue = (voipStatus == CallStatus.STATUS_VIDEOING || voipStatus == CallStatus.STATUS_VIDEOACEPT || voipStatus == CallStatus.STATUS_VIDEOINIT);
 		if (voipStatusIsTrue)
 		{
 			// 释放视频数据
@@ -1773,42 +1823,34 @@ public class CallLogic
 	}
 
 	/**
-	 * 重置音频路由
+	 * 重置音频路由,设置底层默认使用扬声器
 	 */
 	public void resetAudioRoute(boolean isVideo)
 	{
 		LogUtil.d(TAG, "resetAudioRoute");
-		// 存在多个路由，则恢复听筒模式,此Demo不需要默认听筒模式，直接开启扬声器。。
-		// if (1 >= supportAudioRouteList.size())
-		// {
-		// LogUtil.d(TAG, "only one route");
-		// return;
-		// }
+		// 存在多个路由，则恢复听筒模式
+		if (1 >= supportAudioRouteList.size())
+		{
+			LogUtil.d(TAG, "only one route");
+			return;
+		}
 
 		if (null != callManager)
 		{
-
 			// 是否有外部设备(有线耳机和蓝牙耳机)
-			// boolean hasEarphone =
-			// (supportAudioRouteList.contains(EarpieceMode.TYPE_EARPHONE))
-			// || (supportAudioRouteList.contains(EarpieceMode.TYPE_BLUETOOTH));
-			// // 在没有外接设备的情况下视频默认使用扬声器
-			// // 是视频并且无外接耳机时，默认使用扬声器
-			// int resetRoute = ((ConfigApp.getInstance().isUsePadLayout() ||
-			// isVideo) && !hasEarphone) ? EarpieceMode.TYPE_LOUD_SPEAKER
-			// : EarpieceMode.TYPE_AUTO;
-			if (callManager.setAudioRoute(EarpieceMode.TYPE_LOUD_SPEAKER))
+			boolean hasEarphone = (supportAudioRouteList.contains(EarpieceMode.TYPE_EARPHONE))
+					|| (supportAudioRouteList.contains(EarpieceMode.TYPE_BLUETOOTH));
+			// 默认使用扬声器
+			// 是视频并且无外接耳机时，默认使用扬声器
+			int resetRoute = (((!LayoutUtil.isPhone()) || isVideo) && !hasEarphone) ? EarpieceMode.TYPE_LOUD_SPEAKER : EarpieceMode.TYPE_AUTO;
+			if (callManager.setAudioRoute(resetRoute))
 			{
+				LogUtil.d(TAG, "route has been reset to " + resetRoute);
 
 				// 刷新当前使用的路由
 				refreshAudioRoute();
 
-				// if (null != routeCallBack) {
-				// routeCallBack.onAudioRouteSwitch(supportAudioRouteList.get(0));
-				// }
-
-				LogUtil.i(TAG, "changed audioRoute: " + supportAudioRouteList.get(0));
-
+				LogUtil.d(TAG, "changed audioRoute: " + supportAudioRouteList.get(0));
 			}
 		}
 	}
@@ -1830,18 +1872,18 @@ public class CallLogic
 
 			// 听筒
 			case EarpieceMode.TYPE_TELRECEIVER:
-			// 手机下，有听筒
-			// if (LayoutUtil.isPhone())
-			// {
-			// // 把听筒放到第一位，表示当前使用听筒
-			// modSupportAudioRouteList(EarpieceMode.TYPE_TELRECEIVER);
-			// }
-			// Pad下听筒为扬声器
-			// else
-			{
-				// 把扬声器放到第一位，表示当前使用扬声器
-				modSupportAudioRouteList(EarpieceMode.TYPE_LOUD_SPEAKER);
-			}
+				// 手机下，有听筒
+				if (LayoutUtil.isPhone())
+				{
+					// 把听筒放到第一位，表示当前使用听筒
+					modSupportAudioRouteList(EarpieceMode.TYPE_TELRECEIVER);
+				}
+				// Pad下听筒为扬声器
+				else
+				{
+					// 把扬声器放到第一位，表示当前使用扬声器
+					modSupportAudioRouteList(EarpieceMode.TYPE_LOUD_SPEAKER);
+				}
 				break;
 			// 扬声器模式
 			case EarpieceMode.TYPE_LOUD_SPEAKER:
@@ -1869,18 +1911,14 @@ public class CallLogic
 				}
 
 				// 如果有线耳机则把有线耳机放第一位
-				// if
-				// (supportAudioRouteList.contains(EarpieceMode.TYPE_EARPHONE))
-				else if (supportAudioRouteList.contains(EarpieceMode.TYPE_EARPHONE))
+				if (supportAudioRouteList.contains(EarpieceMode.TYPE_EARPHONE))
 				{
 					supportAudioRouteList.remove((Integer) EarpieceMode.TYPE_EARPHONE);
 					supportAudioRouteList.add(0, EarpieceMode.TYPE_EARPHONE);
 				}
 
 				// 如果有蓝牙则把蓝牙放第一位
-				// if
-				// (supportAudioRouteList.contains(EarpieceMode.TYPE_BLUETOOTH))
-				else if (supportAudioRouteList.contains(EarpieceMode.TYPE_BLUETOOTH))
+				if (supportAudioRouteList.contains(EarpieceMode.TYPE_BLUETOOTH))
 				{
 					supportAudioRouteList.remove((Integer) EarpieceMode.TYPE_BLUETOOTH);
 					supportAudioRouteList.add(0, EarpieceMode.TYPE_BLUETOOTH);
@@ -1893,6 +1931,46 @@ public class CallLogic
 			// end modify 蓝牙耳机判断调整，保持和链接状态时的判断结果一致
 			LogUtil.i(TAG, "getAudioRoute:" + route);
 		}
+	}
+
+	/**
+	 * 听筒和扬声器切换
+	 * 
+	 * @return 执行结果 true 执行成功 false 执行失败
+	 */
+	public boolean changeAudioRoute()
+	{
+		boolean ret = false;
+		if (callManager != null)
+		{
+			int curRoute = supportAudioRouteList.get(0);
+			int newType = EarpieceMode.TYPE_LOUD_SPEAKER;
+			// 听筒模式切到扬声器（听筒模式有2:蓝牙；3：听筒； 4：有线耳机）
+			if (EarpieceMode.TYPE_LOUD_SPEAKER != curRoute)
+			{
+				newType = EarpieceMode.TYPE_LOUD_SPEAKER;
+			}
+			// 扬声器模式切到听筒模式
+			else
+			{
+				newType = EarpieceMode.TYPE_AUTO;
+			}
+
+			LogUtil.i(TAG, "change route: " + curRoute + "-->" + newType);
+			if (callManager.setAudioRoute(newType))
+			{
+				LogUtil.i(TAG, "audioroute has been changed newType: " + newType);
+
+				// 刷新当前使用的路由
+				refreshAudioRoute();
+
+				LogUtil.i(TAG, "changed audioRoute: " + supportAudioRouteList.get(0));
+
+				ret = true;
+			}
+		}
+
+		return ret;
 	}
 
 	/**
@@ -1911,10 +1989,10 @@ public class CallLogic
 		}
 
 		// 判断是手机，则把听筒加到第一位，即默认使用听筒模式
-		// if (LayoutUtil.isPhone())
-		// {
-		// supportAudioRouteList.add(0, EarpieceMode.TYPE_TELRECEIVER);
-		// }
+		if (LayoutUtil.isPhone())
+		{
+			supportAudioRouteList.add(EarpieceMode.TYPE_TELRECEIVER);
+		}
 	}
 
 	/**
@@ -2025,7 +2103,6 @@ public class CallLogic
 		currentCallID = null;
 		microphoneMute = false;
 		// fromNumber = null;
-		// routeCallBack = null;
 	}
 
 	/**
@@ -2068,6 +2145,75 @@ public class CallLogic
 		{
 			addViewToContain(localVV, previewLayout);
 		}
+	}
+
+	public boolean openBFCPReceive(ViewGroup localVideoView, ViewGroup remoteVideoView)
+	{
+		// 与pc互通，pc抢发辅流，pad端先显示视频画面，再显示pc辅流画面
+		SurfaceView localVV = VideoHandler.getIns().getLocalCallView();
+		SurfaceView remoteVV = VideoHandler.getIns().getRemoteCallView();
+		SurfaceView remoteBfcpView = VideoHandler.getIns().getRemoteBfcpView();
+		boolean bRet = recvDocCondition(localVV, remoteVV, remoteBfcpView);
+		if (!bRet)
+		{
+			return false;
+		}
+
+		int renderModule = CallCommandParams.MMV_SWITCH_LCLRENDER;
+		if (remoteVideoView.getChildAt(0) == VideoHandler.getIns().getRemoteCallView())
+		{
+			renderModule = CallCommandParams.MMV_SWITCH_RMTRENDER;
+		}
+
+		// stop
+		controlRenderVideo(renderModule, false);
+		remoteVideoView.removeAllViews();
+		// add
+		addViewToContain(remoteBfcpView, remoteVideoView);
+		controlRenderData(CallCommandParams.MMV_SWITCH_RMTRENDER, true);
+
+		if (localVideoView.getChildAt(0) != localVV)
+		{
+			addViewToContain(localVV, localVideoView);
+		}
+		// 小窗口不可见
+		localVV.setVisibility(View.GONE);
+		remoteVV.setVisibility(View.GONE);
+
+		// 为防止此方法比第一帧解码还要慢的时候
+		// 如果还没有解码，就不设置
+		if (null != VideoHandler.getIns().getRemoteBfcpView())
+		{
+			VideoHandler.getIns().getRemoteBfcpView().setVisibility(View.VISIBLE);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * bfcprender控制
+	 * 
+	 * @param witch
+	 *            要切换的render
+	 * @param isOpen
+	 *            true开启
+	 */
+	public boolean controlRenderData(int renderModule, boolean isStart)
+	{
+		int mediaSwitch = isStart ? CallCommandParams.MMV_CONTROL_START : CallCommandParams.MMV_CONTROL_STOP;
+		return dataControl(renderModule, mediaSwitch);
+	}
+
+	private boolean recvDocCondition(SurfaceView localVV, SurfaceView remoteVV, SurfaceView remoteBfcpView)
+	{
+		if (null == localVV || null == remoteVV || null == remoteBfcpView)
+		{
+			LogUtil.e(TAG, "receiveDoc error. [localVV=" + localVV + "] [remoteVV=" + remoteVV + "] [remoteBfcpView=" + remoteBfcpView
+					+ "] [remoteVideoView=" + ']');
+			LogUtil.i(TAG, "leave recevieDoc()");
+			return false;
+		}
+		return true;
 	}
 
 	/**

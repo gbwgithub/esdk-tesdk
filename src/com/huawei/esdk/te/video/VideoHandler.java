@@ -427,11 +427,10 @@ final public class VideoHandler
 			return false;
 		}
 
-		CallLogic callPresenter = CallLogic.getInstance();
-		// CVoip voip = CommonManager.getInstance().getVoip();
-		if (callPresenter == null)
+		CallLogic callLogic = CallLogic.getInstance();
+		if (callLogic == null)
 		{
-			LogUtil.e(TAG, "callPresenter Is Null");
+			LogUtil.e(TAG, "callLogic Is Null");
 			return false;
 		}
 		cameraIndex = (cameraIndex + 1) % numberOfCameras;
@@ -446,7 +445,7 @@ final public class VideoHandler
 			videoCaps.setCameraRotation(OrieantationUtil.getIns().calcCamOrieantation(cameraIndex));
 		}
 		// 切换摄像头
-		if (callPresenter.switchCamera(getCaps()))
+		if (callLogic.switchCamera(getCaps()))
 		{
 			LogUtil.d(TAG, "Switch Success");
 			// 当摄像头切换时要改变这个值 不然图像首次不会校准

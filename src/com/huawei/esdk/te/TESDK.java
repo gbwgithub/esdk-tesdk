@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.huawei.application.BaseApp;
@@ -25,6 +26,7 @@ import com.huawei.esdk.te.call.CallLogic;
 import com.huawei.esdk.te.data.Constants;
 import com.huawei.esdk.te.util.LayoutUtil;
 import com.huawei.esdk.te.util.LogUtil;
+import com.huawei.esdk.te.util.OrieantationUtil;
 import com.huawei.manager.DataManager;
 import com.huawei.module.SDKConfigParam;
 import com.huawei.service.ServiceProxy;
@@ -52,7 +54,7 @@ public class TESDK
 
 	private String logPath = "";
 
-	private boolean debugSwitch;
+	private boolean debugSwitch = true;
 
 	private boolean mServiceStarted;
 	private ServiceProxy mService = null;
@@ -64,15 +66,42 @@ public class TESDK
 
 	public static void initSDK(Application app)
 	{
-		instance = new TESDK(app);
 		BaseApp.setApp(app);
+		instance = new TESDK(app);
 	}
 
 	private TESDK(Application app)
 	{
+		Log.d(TAG, "TESDK construct");
 		application = app;
 		debugSwitch = false;
 		logPath = application.getFilesDir().getPath() + SDK_LOG_DIR;
+		Log.d(TAG, "init logPath -> " + logPath);
+
+		boolean isPhone = false;
+		OrieantationUtil.getIns().setDeviceReferenceAngle();
+		int orientation = OrieantationUtil.getIns().getDevicereferenceangle();
+		// 手机默认摄像头基准角度是 270，pad是 0 。android5.0 nexus 6基准角度为90
+		// if ((0 == orientation || 180 == orientation) &&
+		// LayoutUtil.getInstance().isPadScreen())
+		if (LayoutUtil.getInstance().isPadScreen())
+		{
+			isPhone = false;
+		} else
+		{
+			isPhone = true;
+		}
+
+		Log.d(TAG, "isPhone -> " + isPhone);
+		LayoutUtil.setIsPhone(isPhone);
+		// LayoutUtil.setCustomizeVersions(application.getResources().getString(R.string.customize_versions));
+		// LayoutUtil.setLoadPortLayout(getResources().getBoolean(R.bool.mobile_screen));
+
+		// File logFileDir = new File(logPath);
+		// if (!logFileDir.exists())
+		// {
+		// logFileDir.mkdir();
+		// }
 	}
 
 	public static TESDK getInstance()
@@ -99,15 +128,20 @@ public class TESDK
 	 */
 	public void setLogPath(boolean debugSwitch, String path)
 	{
-		//设置Log开关与路径
+		// 设置Log开关与路径
 		this.debugSwitch = debugSwitch;
 		this.logPath = path;
 		if (null != path && "".equals(path))
 		{
 			this.logPath = path;
 		}
-		//执行设置Log开关
+		// 执行设置Log开关
 		logSwitch();
+	}
+
+	public String getLogPath()
+	{
+		return this.logPath;
 	}
 
 	/**
@@ -312,8 +346,10 @@ public class TESDK
 		}
 	}
 
-	public void login(final LoginInfo loginInfo)
+	public void login(final LoginParameter loginParameter)
 	{
+		final LoginInfo loginInfo = loginParameter.getLoginInfo();
+
 		boolean isAnonymous = loginInfo.isAnonymousLogin();
 		String username = loginInfo.getLoginName();
 
@@ -327,7 +363,6 @@ public class TESDK
 		}
 
 		// 如果网络问题无法登录做提示
-		// if (!DeviceManager.isNetworkAvailable(this) && isGeneralLogin)
 		if (!DeviceManager.isNetworkAvailable(application))
 		{
 			Toast.makeText(application, "网络已断开", Toast.LENGTH_SHORT).show();
@@ -426,6 +461,7 @@ public class TESDK
 		}
 
 		// login返回false时上报错误状态
+		System.out.println("mService.login");
 		if (!mService.login(loginInfo, application))
 		{
 			eSpaceService.getService().onLoginResult(State.UNREGISTE, Resource.NETWORK_INVALID);
@@ -481,4 +517,191 @@ public class TESDK
 		LogUtil.i(TAG, "exit app.");
 	}
 
+	public static class LoginParameter
+	{
+
+		private LoginInfo loginInfo;
+
+		public LoginInfo getLoginInfo()
+		{
+			return this.loginInfo;
+		}
+
+		public LoginParameter()
+		{
+			this.loginInfo = new LoginInfo();
+			// 设置非匿名登录
+			loginInfo.setAnonymousLogin(false);
+		}
+
+		public String getLoginName()
+		{
+			return loginInfo.getLoginName();
+		}
+
+		public void setLoginName(String loginName)
+		{
+			this.loginInfo.setLoginName(loginName);
+		}
+
+		public String getLoginPwd()
+		{
+			return this.loginInfo.getLoginPwd();
+		}
+
+		public void setLoginPwd(String loginPwd)
+		{
+			this.loginInfo.setLoginPwd(loginPwd);
+		}
+
+		public String getServerIP()
+		{
+			return this.loginInfo.getServerIP();
+		}
+
+		public void setServerIP(String serverIP)
+		{
+			this.loginInfo.setServerIP(serverIP);
+		}
+
+		public String getServerPort()
+		{
+			return this.loginInfo.getServerPort();
+		}
+
+		public void setServerPort(String serverPort)
+		{
+			this.loginInfo.setServerPort(serverPort);
+		}
+
+		public boolean isAutoLogin()
+		{
+			return this.loginInfo.isAutoLogin();
+		}
+
+		public void setAutoLogin(boolean isAutoLogin)
+		{
+			this.loginInfo.setAutoLogin(isAutoLogin);
+		}
+
+		public String getProtocolType()
+		{
+			return this.loginInfo.getProtocolType();
+		}
+
+		public void setProtocolType(String protocolType)
+		{
+			this.loginInfo.setProtocolType(protocolType);
+		}
+
+		public boolean isBfcpEnable()
+		{
+			return this.loginInfo.isBfcpEnable();
+		}
+
+		public void setBfcpEnable(boolean isBfcpEnable)
+		{
+			this.loginInfo.setBfcpEnable(isBfcpEnable);
+		}
+
+		public int getEncryptMode()
+		{
+			return this.loginInfo.getEncryptMode();
+		}
+
+		public void setEncryptMode(int encryptMode)
+		{
+			this.loginInfo.setEncryptMode(encryptMode);
+		}
+
+		public int getCallBandWidth()
+		{
+			return this.loginInfo.getCallBandWidth();
+		}
+
+		public void setCallBandWidth(int callBandWidth)
+		{
+			this.loginInfo.setCallBandWidth(callBandWidth);
+		}
+
+		public int getVideoMode()
+		{
+			return this.loginInfo.getVideoMode();
+		}
+
+		public void setVideoMode(int videoMode)
+		{
+			this.loginInfo.setVideoMode(videoMode);
+		}
+
+		public int getMediaPort()
+		{
+			return this.loginInfo.getMediaPort();
+		}
+
+		public void setMediaPort(int mediaPort)
+		{
+			this.loginInfo.setMediaPort(mediaPort);
+		}
+
+		public int getSipPort()
+		{
+			return this.loginInfo.getSipPort();
+		}
+
+		public void setSipPort(int sipPort)
+		{
+			this.loginInfo.setSipPort(sipPort);
+		}
+
+		public int getIsILBCPri()
+		{
+			return this.loginInfo.getIsILBCPri();
+		}
+
+		public void setIsILBCPri(int ilbcAudioPri)
+		{
+			this.loginInfo.setIsILBCPri(ilbcAudioPri);
+		}
+
+		public int getCT()
+		{
+			return this.loginInfo.getCT();
+		}
+
+		public void setCT(int ct)
+		{
+			this.loginInfo.setCT(ct);
+		}
+
+		public String getSipuri()
+		{
+			return this.loginInfo.getSipuri();
+		}
+
+		public void setSipuri(String sipuri)
+		{
+			this.loginInfo.setSipuri(sipuri);
+		}
+
+		public boolean isSupportSipSessionTimer()
+		{
+			return this.loginInfo.isSupportSipSessionTimer();
+		}
+
+		public void setSupportSipSessionTimer(boolean isSupportSipSessionTimer)
+		{
+			this.loginInfo.setSupportSipSessionTimer(isSupportSipSessionTimer);
+		}
+
+		public String getLicenseServer()
+		{
+			return this.loginInfo.getLicenseServer();
+		}
+
+		public void setLicenseServer(String licenseServer)
+		{
+			this.loginInfo.setLicenseServer(licenseServer);
+		}
+	}
 }
