@@ -349,10 +349,12 @@ public class TESDK
 	public void login(final LoginParameter loginParameter)
 	{
 		final LoginInfo loginInfo = loginParameter.getLoginInfo();
-
-		boolean isAnonymous = loginInfo.isAnonymousLogin();
+		boolean isAnonymous = false;
+		loginInfo.setAnonymousLogin(isAnonymous);
+		loginInfo.setAutoLogin(false);
+		loginInfo.setBfcpEnable(true);
+		
 		String username = loginInfo.getLoginName();
-
 		// 初始化Datamanager
 		DataManager.getIns().init(application, isAnonymous ? Constants.ANONYMOUS_ACCOUNT : username);
 
@@ -503,6 +505,16 @@ public class TESDK
 		}
 	};
 
+	
+	public void function(){
+        //切到前台时，订阅在线状态
+        if ((mService != null) && (mService.getCallManager() != null))
+        {
+        	mService.getCallManager().tupSubscribeStatePresence();      
+        }
+	}
+	
+	
 	/**
 	 * 退出eSpace 程序 清理缓存数据和销毁UI
 	 */

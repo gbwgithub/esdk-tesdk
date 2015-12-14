@@ -119,7 +119,7 @@ public class CallService
 		if (null != remoteVV && null == remoteVV.getParent())
 		{
 			// 只有第一次进入视频通话的时候才去添加view，如果是视频参数更改之类的就不去做此操作
-			CallLogic.getInstance().addRenderToContain(localViewContain, remoteViewContain, isLocal);
+			VideoHandler.getIns().addRenderToContain(localViewContain, remoteViewContain, isLocal);
 		}
 	}
 
@@ -237,6 +237,14 @@ public class CallService
 	public void setCameraDegree(int cameraRotation, int localRotation)
 	{
 		CallLogic.getInstance().setCameraDegree(cameraRotation, localRotation);
+	}
+	
+	/**
+	 * 向sdk层设置带宽参数并使其生效 带宽等于64时禁用BFCP
+	 */
+	public boolean setBandwidth(int bw)
+	{
+		return CallLogic.getInstance().setFastBandwidth(bw);
 	}
 
 	/**

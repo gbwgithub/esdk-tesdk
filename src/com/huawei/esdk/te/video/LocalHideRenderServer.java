@@ -303,7 +303,7 @@ public class LocalHideRenderServer extends Service {
 		LogUtil.d(TAG, "program run from background.");
 		// CommonManager.getInstance().getVoip().localCameraControl(false);
 
-		CallLogic.getInstance().localCameraControl(true);
+		CallLogic.getInstance().localCameraControl(false);
 	}
 
 	public boolean isBackground() {

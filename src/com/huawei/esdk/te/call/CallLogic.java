@@ -29,6 +29,8 @@ import com.huawei.esdk.te.util.OrieantationUtil;
 import com.huawei.esdk.te.video.LocalHideRenderServer;
 import com.huawei.esdk.te.video.VideoHandler;
 import com.huawei.service.ServiceProxy;
+import com.huawei.service.eSpaceService;
+import com.huawei.utils.PlatformInfo;
 import com.huawei.utils.StringUtil;
 import com.huawei.voip.CallManager;
 import com.huawei.voip.CallSession;
@@ -38,7 +40,9 @@ import com.huawei.voip.data.CameraViewRefresh;
 import com.huawei.voip.data.EarpieceMode;
 import com.huawei.voip.data.EventData;
 import com.huawei.voip.data.SessionBean;
+import com.huawei.voip.data.VOIPConfigParamsData;
 import com.huawei.voip.data.VideoCaps;
+import com.huawei.voip.data.VideoCaps.BAND_WIDTH;
 
 public class CallLogic
 {
@@ -111,6 +115,8 @@ public class CallLogic
 	 * 系统是否处在静音，在拨号的时候第一次初始化
 	 */
 	private static boolean isSlient = false;
+
+	private boolean isRenderRemoveDone = true;
 
 	/**
 	 * 本地麦克风是否静音
@@ -355,31 +361,6 @@ public class CallLogic
 
 		addDefaultAudioRoute();
 	}
-
-	// public synchronized void registerNotification(CallNotification listener)
-	// {
-	// if (listener != null && !mCallNotificationListeners.contains(listener))
-	// mCallNotificationListeners.add(listener);
-	// }
-	//
-	// public synchronized void unRegisterNofitication(CallNotification
-	// listener)
-	// {
-	// if (null == mCallNotificationListeners)
-	// {
-	// return;
-	// }
-	// if (listener == null)
-	// {
-	// LogUtilUtil.d(TAG, "CallManager remove all CallBack");
-	// mCallNotificationListeners.clear();
-	// } else
-	// {
-	// mCallNotificationListeners.remove(listener);
-	// }
-	// if (!mCallNotificationListeners.isEmpty())
-	// return;
-	// }
 
 	/**
 	 * 发起呼叫
@@ -936,11 +917,14 @@ public class CallLogic
 		params.setCallID(currentCallID);
 		callManager.executeCallCommand(CallCommands.CALL_CMD_CAMERA_ROTATION, params);
 	}
-	
+
 	/**
 	 * 摄像头旋转角度设置
-	 * @param cameraRotation 设置摄像头采集角度（视频捕获角度）
-	 * @param localRotation 设置本地图像显示角度
+	 * 
+	 * @param cameraRotation
+	 *            设置摄像头采集角度（视频捕获角度）
+	 * @param localRotation
+	 *            设置本地图像显示角度
 	 */
 	public void setCameraDegree(int cameraRotation, int localRotation)
 	{
@@ -2216,51 +2200,144 @@ public class CallLogic
 		return true;
 	}
 
-	/**
-	 * 把本地和远端视频画面填加到界面布局中
-	 * 
-	 * @param localView
-	 *            包含本地render
-	 * @param remoteView
-	 *            包含远端render
-	 * @param isLocal
-	 *            true 本地最上面 false远端最上面
-	 */
-	public void addRenderToContain(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
+	
+	//!menuBarPanel.isCameraClose()
+	public boolean function(ViewGroup remoteVideoView, ViewGroup localVideoView, boolean isLocalCameraClosed)
 	{
-		LogUtil.d(TAG, "addRenderToContain()");
 
+		if (null == remoteVideoView || null == localVideoView)
+		{
+			return false;
+		}
+
+		// 多次辅流，出现问题，远端是pdfview会出现问题
+		if (null != remoteVideoView.getChildAt(0) && null != localVideoView.getChildAt(0) && !(remoteVideoView.getChildAt(0) instanceof SurfaceView)
+				|| !(localVideoView.getChildAt(0) instanceof SurfaceView))
+		{
+			LogUtil.i(TAG, "remote or local not is surfaceView");
+			return false;
+		}
+
+		SurfaceView remoteVV = (SurfaceView) remoteVideoView.getChildAt(0);
+		SurfaceView localVV = (SurfaceView) localVideoView.getChildAt(0);
+		if (null == remoteVV || null == localVV)
+		{
+			return false;
+		}
+		if (!isRenderRemoveDone)
+		{
+			LogUtil.e(TAG, "render change is not readly");
+			return false;
+		}
+
+		localRemoteControl(remoteVideoView, localVideoView, isLocalCameraClosed);
+		return true;
+	}
+
+	/**
+	 * 本端远端操作
+	 */
+	private void localRemoteControl(ViewGroup remoteVideoView, ViewGroup localVideoView, boolean isLocalCameraClosed)
+	{
+		LogUtil.d(TAG, "localRemoteControl()");
+		SurfaceView remoteVV = (SurfaceView) remoteVideoView.getChildAt(0);
+		SurfaceView localVV = (SurfaceView) localVideoView.getChildAt(0);
+		
+		isRenderRemoveDone = false;
 		synchronized (RENDER_CHANGE_LOCK)
 		{
-			VideoHandler.getIns().setRemoteVideoView((RelativeLayout) remoteViewContain);
 			controlRenderVideo(CallCommandParams.MMV_SWITCH_LCLRENDER | CallCommandParams.MMV_SWITCH_RMTRENDER, false);
-			localViewContain.removeAllViews();
-			remoteViewContain.removeAllViews();
-			SurfaceView localVV = VideoHandler.getIns().getLocalCallView();
-			SurfaceView remoteVV = VideoHandler.getIns().getRemoteCallView();
+			localVideoView.removeAllViews();
+			remoteVideoView.removeAllViews();
 
-			if (null == localVV || null == remoteVV)
+			localVV.setZOrderMediaOverlay(true);
+			remoteVV.setZOrderMediaOverlay(false);
+
+			// 视频通话，打开手机自带相机功能，软终端本地视频卡住，不能通过开关摄像头按钮进行恢复
+			boolean bRet = false;
+			// 针对低系统手机切换时会出现 有图像闪动问题
+			LogUtil.d(TAG, "AndroidVersion -> " + PlatformInfo.getAndroidVersion());
+			if (PlatformInfo.getAndroidVersion() < PlatformInfo.ANDROID_VER_3_0)
 			{
+				bRet = videoControl(CallCommandParams.MMV_SWITCH_CAPTURE, CallCommandParams.MMV_CONTROL_STOP);
+				LogUtil.i(TAG, "capture stop: " + bRet);
+				// 停止失败，可能摄像头已系统占用，直接关闭，之后再重启
+				if (!bRet)
+				{
+					bRet = videoControl(CallCommandParams.MMV_SWITCH_CAPTURE, CallCommandParams.MMV_CONTROL_CLOSE);
+					LogUtil.i(TAG, "capture close: " + bRet);
+				}
+			}
+
+			addViewToContain(localVV, localVideoView);
+			addViewToContain(remoteVV, remoteVideoView);
+			controlRenderVideo(CallCommandParams.MMV_SWITCH_LCLRENDER | CallCommandParams.MMV_SWITCH_RMTRENDER, true);
+
+			if (PlatformInfo.getAndroidVersion() >= PlatformInfo.ANDROID_VER_3_0)
+			{
+				isRenderRemoveDone = true;
 				return;
 			}
-
-			if (isLocal)
+			bRet = videoControl(CallCommandParams.MMV_SWITCH_CAPTURE, CallCommandParams.MMV_CONTROL_START);
+			LogUtil.i(TAG, "capture start: " + bRet);
+			// 启动失败，则关闭重新打开
+			if (!bRet)
 			{
-				remoteVV.setZOrderMediaOverlay(false);
-				localVV.setZOrderMediaOverlay(true);
+				bRet = videoControl(CallCommandParams.MMV_SWITCH_CAPTURE, CallCommandParams.MMV_CONTROL_CLOSE);
+				LogUtil.i(TAG, "--capture close: " + bRet);
+				bRet = videoControl(CallCommandParams.MMV_SWITCH_CAPTURE, CallCommandParams.MMV_CONTROL_OPEN | CallCommandParams.MMV_CONTROL_START);
+				LogUtil.i(TAG, "--capture open: " + bRet);
 
-				addViewToContain(remoteVV, remoteViewContain);
-				addViewToContain(localVV, localViewContain);
-			} else
-			{
-				localVV.setZOrderMediaOverlay(false);
-				remoteVV.setZOrderMediaOverlay(true);
-				addViewToContain(localVV, localViewContain);
-				addViewToContain(remoteVV, remoteViewContain);
+				if (!isLocalCameraClosed)
+				{
+					bRet = localCameraControl(true);
+					LogUtil.i(TAG, "--capture close camara: " + bRet);
+					bRet = localCameraControl(false);
+					LogUtil.i(TAG, "--capture open camara: " + bRet);
+				}
 			}
-			controlRenderVideo(CallCommandParams.MMV_SWITCH_LCLRENDER | CallCommandParams.MMV_SWITCH_RMTRENDER, true);
-			controlRenderVideo(CallCommandParams.MMV_SWITCH_CAPTURE, true);
+			// 视频通话，打开手机自带相机功能，软终端本地视频卡住，不能通过开关摄像头按钮进行恢复
 		}
+	}
+
+	/**
+	 * 向sdk层设置带宽参数并使其生效 带宽等于64时禁用BFCP
+	 */
+	public boolean setFastBandwidth(int bw)
+	{
+		LogUtil.i(TAG, "setFastBandwidth enter. " + bw);
+		CallManager callManager = eSpaceService.getService().callManager;
+		if (null == callManager)
+		{
+			LogUtil.i(TAG, "callManager is Null");
+			return false;
+		}
+		VOIPConfigParamsData voipConfig = callManager.getVoipConfig();
+		if (null == voipConfig)
+		{
+			LogUtil.i(TAG, "voipConfig is Null");
+			return false;
+		}
+		// 带宽等于64时禁用BFCP
+		if (BAND_WIDTH.BW_64 == bw)
+		{
+			voipConfig.setIsBfcpEnable(false);
+		} else
+		{
+			voipConfig.setIsBfcpEnable(true);
+		}
+
+		// CT值设置成和带宽一样
+		voipConfig.setCT(bw);
+		voipConfig.setCallBandWidth(bw);
+		// 重新设置媒体信息
+		// callManager.setLowBandWidthAbility();
+		// callManager.resetAudioCodec();
+		callManager.setIsEnableBfcp();
+		callManager.setCT(bw);
+		callManager.setVideoDataParam(bw);
+		LogUtil.i(TAG, "setFastBandwidth leave.");
+		return true;
 	}
 
 }

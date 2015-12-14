@@ -23,6 +23,7 @@ import com.huawei.utils.PlatformInfo;
 import com.huawei.videoengine.CaptureCapabilityAndroid;
 import com.huawei.videoengine.ViERenderer;
 import com.huawei.videoengine.VideoCaptureDeviceInfoAndroid;
+import com.huawei.voip.data.CallCommandParams;
 import com.huawei.voip.data.VOIPConfigParamsData;
 import com.huawei.voip.data.VideoCaps;
 import common.VideoWndType;
@@ -42,6 +43,11 @@ final public class VideoHandler
 	private Handler uiHandler = null;
 
 	private boolean isRenderRemoveDone = true;
+
+	/**
+	 * render控制锁
+	 */
+	private static final Object RENDER_CHANGE_LOCK = new Object();
 
 	/**
 	 * 摄像头能力
@@ -359,7 +365,8 @@ final public class VideoHandler
 		for (int i = 0; i < caps.length; i++)
 		{
 			result[i] = caps[i].width * caps[i].height;
-			LogUtil.i(TAG, "cameraIndex:" + index + "VRawType:" + caps[i].VRawType + ' ' + caps[i].width + '*' + caps[i].height + " MaxFps:" + caps[i].maxFPS);
+			LogUtil.i(TAG, "cameraIndex:" + index + "VRawType:" + caps[i].VRawType + ' ' + caps[i].width + '*' + caps[i].height + " MaxFps:"
+					+ caps[i].maxFPS);
 		}
 		return result;
 	}
@@ -779,6 +786,53 @@ final public class VideoHandler
 	public int getCurTurnDegree()
 	{
 		return curTurnDegree;
+	}
+
+	/**
+	 * 把本地和远端视频画面填加到界面布局中
+	 * 
+	 * @param localView
+	 *            包含本地render
+	 * @param remoteView
+	 *            包含远端render
+	 * @param isLocal
+	 *            true 本地最上面 false远端最上面
+	 */
+	public void addRenderToContain(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
+	{
+		LogUtil.d(TAG, "addRenderToContain()");
+
+		synchronized (RENDER_CHANGE_LOCK)
+		{
+			VideoHandler.getIns().setRemoteVideoView((RelativeLayout) remoteViewContain);
+			CallLogic.getInstance().controlRenderVideo(CallCommandParams.MMV_SWITCH_LCLRENDER | CallCommandParams.MMV_SWITCH_RMTRENDER, false);
+			localViewContain.removeAllViews();
+			remoteViewContain.removeAllViews();
+			SurfaceView localVV = VideoHandler.getIns().getLocalCallView();
+			SurfaceView remoteVV = VideoHandler.getIns().getRemoteCallView();
+
+			if (null == localVV || null == remoteVV)
+			{
+				return;
+			}
+
+			if (isLocal)
+			{
+				remoteVV.setZOrderMediaOverlay(false);
+				localVV.setZOrderMediaOverlay(true);
+
+				addViewToContain(remoteVV, remoteViewContain);
+				addViewToContain(localVV, localViewContain);
+			} else
+			{
+				localVV.setZOrderMediaOverlay(false);
+				remoteVV.setZOrderMediaOverlay(true);
+				addViewToContain(localVV, localViewContain);
+				addViewToContain(remoteVV, remoteViewContain);
+			}
+			CallLogic.getInstance().controlRenderVideo(CallCommandParams.MMV_SWITCH_LCLRENDER | CallCommandParams.MMV_SWITCH_RMTRENDER, true);
+			CallLogic.getInstance().controlRenderVideo(CallCommandParams.MMV_SWITCH_CAPTURE, true);
+		}
 	}
 
 	/**
