@@ -241,7 +241,7 @@ public class CallService
 	}
 	
 	/**
-	 * 向sdk层设置带宽参数并使其生效 带宽等于64时禁用BFCP
+	 * 向sdk层设置媒体带宽参数并使其生效 带宽等于64时禁用BFCP
 	 */
 	public boolean setBandwidth(int bw)
 	{
