@@ -3,11 +3,14 @@ package com.huawei.esdk.te;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,11 +25,13 @@ import com.huawei.common.Resource;
 import com.huawei.ecs.mtk.log.AndroidLogger;
 import com.huawei.ecs.mtk.log.LogLevel;
 import com.huawei.ecs.mtk.log.Logger;
+import com.huawei.esdk.te.call.CallConstants.CallStatus;
 import com.huawei.esdk.te.call.CallLogic;
 import com.huawei.esdk.te.data.Constants;
 import com.huawei.esdk.te.util.LayoutUtil;
 import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.esdk.te.util.OrieantationUtil;
+import com.huawei.esdk.te.video.LocalHideRenderServer;
 import com.huawei.manager.DataManager;
 import com.huawei.module.SDKConfigParam;
 import com.huawei.service.ServiceProxy;
@@ -63,6 +68,7 @@ public class TESDK
 
 	private static final byte[] SERVICE_LOCK = new byte[0];
 	private final Object synLock = new Object();
+	private boolean isRegisterScreenReceiver = false;
 
 	public static void initSDK(Application app)
 	{
@@ -348,12 +354,15 @@ public class TESDK
 
 	public void login(final LoginParameter loginParameter)
 	{
+		// 注册锁屏广播，用以解决视频通话中锁屏的问题
+		instance.registerScreenActionReceiver(application);
+
 		final LoginInfo loginInfo = loginParameter.getLoginInfo();
 		boolean isAnonymous = false;
 		loginInfo.setAnonymousLogin(isAnonymous);
 		loginInfo.setAutoLogin(false);
 		loginInfo.setBfcpEnable(true);
-		
+
 		String username = loginInfo.getLoginName();
 		// 初始化Datamanager
 		DataManager.getIns().init(application, isAnonymous ? Constants.ANONYMOUS_ACCOUNT : username);
@@ -498,6 +507,7 @@ public class TESDK
 			synchronized (synLock)
 			{
 				stopSDKService();
+				instance.unRegisterScreenActionReceiver(application);
 			}
 
 			// 回到登录界面时去初始化Datamanager
@@ -505,16 +515,91 @@ public class TESDK
 		}
 	};
 
-	
-	public void function(){
-        //切到前台时，订阅在线状态
-        if ((mService != null) && (mService.getCallManager() != null))
-        {
-        	mService.getCallManager().tupSubscribeStatePresence();      
-        }
+	public void registerScreenActionReceiver(Context mContext)
+	{
+		if (!isRegisterScreenReceiver)
+		{
+			isRegisterScreenReceiver = true;
+
+			IntentFilter filter = new IntentFilter();
+			filter.addAction(Intent.ACTION_SCREEN_OFF);
+			filter.addAction(Intent.ACTION_SCREEN_ON);
+
+			mContext.registerReceiver(screenActionReceiver, filter);
+		}
 	}
-	
-	
+
+	public void unRegisterScreenActionReceiver(Context mContext)
+	{
+		if (isRegisterScreenReceiver)
+		{
+			isRegisterScreenReceiver = false;
+			mContext.unregisterReceiver(screenActionReceiver);
+		}
+	}
+
+	private class ScreenActionReceiver extends BroadcastReceiver
+	{
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			String action = intent.getAction();
+			if (action.equals(Intent.ACTION_SCREEN_ON))
+			{
+				LogUtil.d(TAG, "ACTION_SCREEN_ON");
+				if (null == CallLogic.getInstance())
+				{
+					return;
+				}
+				if (CallStatus.STATUS_VIDEOINIT == CallLogic.getInstance().getVoipStatus()
+						| CallStatus.STATUS_VIDEOING == CallLogic.getInstance().getVoipStatus())
+				{
+					LogUtil.d(TAG, "ACTION_SCREEN_ON & voidoing");
+					if (null != LocalHideRenderServer.getInstance())
+					{
+						if (!CallLogic.getInstance().isUserCloseLocalCamera())
+						{
+							Executors.newSingleThreadExecutor().execute(new BackFromBackground());
+						} else
+						{
+							LocalHideRenderServer.getInstance().setBackground(false);
+						}
+					}
+				}
+			} else if (action.equals(Intent.ACTION_SCREEN_OFF))
+			{
+				LogUtil.d(TAG, "ACTION_SCREEN_OFF");
+				if (null == CallLogic.getInstance())
+				{
+					return;
+				}
+				if (CallStatus.STATUS_VIDEOINIT == CallLogic.getInstance().getVoipStatus()
+						| CallStatus.STATUS_VIDEOING == CallLogic.getInstance().getVoipStatus())
+				{
+					LogUtil.d(TAG, "ACTION_SCREEN_OFF & voidoing");
+					if (null != LocalHideRenderServer.getInstance())
+					{
+						LocalHideRenderServer.getInstance().doInBackground();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * 后台切换内部类
+	 */
+	private static final class BackFromBackground implements Runnable
+	{
+		@Override
+		public void run()
+		{
+			LocalHideRenderServer.getInstance().doBackFromBackground();
+		}
+	}
+
+	private ScreenActionReceiver screenActionReceiver = new ScreenActionReceiver();
+
 	/**
 	 * 退出eSpace 程序 清理缓存数据和销毁UI
 	 */

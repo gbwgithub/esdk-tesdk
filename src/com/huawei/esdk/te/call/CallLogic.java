@@ -67,9 +67,19 @@ public class CallLogic
 	private CallManager callManager;
 
 	/**
-	 * 是否需要清空视频数据,用于提供给上层Demo，做判断接听状态，以清除预览数据的依据
+	 * 用户调用了关闭本地摄像头操作
 	 */
-	private boolean isNeedClearVideo = false;
+	private boolean isUserCloseLocalCamera = false;
+
+	public boolean isUserCloseLocalCamera()
+	{
+		return isUserCloseLocalCamera;
+	}
+
+	public void setUserCloseLocalCamera(boolean isUserCloseLocalCamera)
+	{
+		this.isUserCloseLocalCamera = isUserCloseLocalCamera;
+	}
 
 	/**
 	 * BFCP 状态
@@ -259,6 +269,7 @@ public class CallLogic
 		voipStatus = CallStatus.STATUS_CLOSE;
 		beginTime = 0;
 		isVideoCall = false;
+		isUserCloseLocalCamera = false;
 	}
 
 	/*
@@ -1203,7 +1214,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_LOCAL_CAMERA_CONTROL, params);
 
 		boolean bRet = parseRet(sRet);
-		LogUtil.i(TAG, "close local camera Success" + bRet);
+		LogUtil.i(TAG, "close local camera isCloseAction -> " + isCloseAction +" isSuccess -> " + bRet);
 		return bRet;
 	}
 
@@ -2087,6 +2098,7 @@ public class CallLogic
 		currentCallID = null;
 		microphoneMute = false;
 		// fromNumber = null;
+		isUserCloseLocalCamera = false;
 	}
 
 	/**
@@ -2201,8 +2213,8 @@ public class CallLogic
 	}
 
 	
-	//!menuBarPanel.isCameraClose()
-	public boolean function(ViewGroup remoteVideoView, ViewGroup localVideoView, boolean isLocalCameraClosed)
+	//视频通话中锁屏恢复，非gl需要重新加载一次,针对3.0以下的机器，没有开放此接口!menuBarPanel.isCameraClose()
+	public boolean reLoadRemoteLocal(ViewGroup remoteVideoView, ViewGroup localVideoView, boolean isLocalCameraClosed)
 	{
 
 		if (null == remoteVideoView || null == localVideoView)

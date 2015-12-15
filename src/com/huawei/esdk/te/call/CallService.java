@@ -132,6 +132,7 @@ public class CallService
 	 */
 	public boolean localCameraControl(boolean isCloseAction)
 	{
+		CallLogic.getInstance().setUserCloseLocalCamera(isCloseAction);
 		return CallLogic.getInstance().localCameraControl(isCloseAction);
 	}
 
