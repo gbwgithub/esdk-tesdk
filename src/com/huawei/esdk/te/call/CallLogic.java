@@ -392,10 +392,6 @@ public class CallLogic
 		VideoCaps dataCaps = null;
 		if (isVideoCall)
 		{
-			// 初始化视频参数
-			// VideoHandler.getIns().initCallVideo();
-			// vcaps = VideoHandler.getIns().getCaps();
-			// To invoke
 			vcaps = VideoHandler.getIns().initCallVideo();
 			dataCaps = VideoHandler.getIns().getDataCaps();
 		}
@@ -741,7 +737,6 @@ public class CallLogic
 		{
 			// 接听后未收到会话成功为此状态
 			setVoipStatus(CallStatus.STATUS_VIDEOING);
-			// CallActionNotifyActivty.getIns().notifyCallModify(CallLogic.ModifyNoticeType.defaultType);
 			resetAudioRoute(true);
 			// setCameraEx(VideoHandler.getIns().getCurTurnDegree(),
 			// VideoHandler.getIns().getCameraType());
@@ -765,7 +760,7 @@ public class CallLogic
 		}
 
 		boolean ret = false;
-		if (StringUtil.isStringEmpty(currentCallID)) // / *当前操作的会话不存在*/)
+		if (StringUtil.isStringEmpty(currentCallID)) // (/*当前操作的会话不存在*/)
 		{
 			return ret;
 		}
@@ -815,14 +810,12 @@ public class CallLogic
 		if (ret)
 		{
 			setVoipStatus(CallStatus.STATUS_VIDEOINIT);
-			// CallActionNotifyActivty.getIns().notifyCallViewUpdate();
 		}
 
 		// 低带宽升级失败
 		else if (CallErrorCode.UPDATE_FAIL_LOW_BW.equals(sRet))
 		{
 			setVoipStatus(CallStatus.STATUS_TALKING);
-			// CallActionNotifyActivty.getIns().notifyLowBWUpdateFail();
 		}
 		return ret;
 	}
@@ -1214,7 +1207,7 @@ public class CallLogic
 		String sRet = callManager.executeCallCommand(CallCommands.CALL_CMD_LOCAL_CAMERA_CONTROL, params);
 
 		boolean bRet = parseRet(sRet);
-		LogUtil.i(TAG, "close local camera isCloseAction -> " + isCloseAction +" isSuccess -> " + bRet);
+		LogUtil.i(TAG, "close local camera isCloseAction -> " + isCloseAction + " isSuccess -> " + bRet);
 		return bRet;
 	}
 
@@ -2212,8 +2205,7 @@ public class CallLogic
 		return true;
 	}
 
-	
-	//视频通话中锁屏恢复，非gl需要重新加载一次,针对3.0以下的机器，没有开放此接口!menuBarPanel.isCameraClose()
+	// 视频通话中锁屏恢复，非gl需要重新加载一次,针对3.0以下的机器，没有开放此接口!menuBarPanel.isCameraClose()
 	public boolean reLoadRemoteLocal(ViewGroup remoteVideoView, ViewGroup localVideoView, boolean isLocalCameraClosed)
 	{
 
@@ -2254,7 +2246,7 @@ public class CallLogic
 		LogUtil.d(TAG, "localRemoteControl()");
 		SurfaceView remoteVV = (SurfaceView) remoteVideoView.getChildAt(0);
 		SurfaceView localVV = (SurfaceView) localVideoView.getChildAt(0);
-		
+
 		isRenderRemoveDone = false;
 		synchronized (RENDER_CHANGE_LOCK)
 		{

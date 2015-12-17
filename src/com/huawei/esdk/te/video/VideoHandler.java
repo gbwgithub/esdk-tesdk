@@ -760,8 +760,6 @@ final public class VideoHandler
 	 * 
 	 * @param usingRemoteView
 	 *            目前使用的窗口
-	 * @since 1.1
-	 * @history 2013-9-1 v1.0.0 z00199735 create
 	 */
 	public void setUseRemoteView(SurfaceView usingRemoteView)
 	{
@@ -926,8 +924,6 @@ final public class VideoHandler
 	 * 
 	 * 还原本远端 render
 	 * 
-	 * @since 1.1
-	 * @history 2013-9-23 v1.0.0 cWX176935 create
 	 * @deprecated
 	 */
 	public void resetRender()
@@ -947,8 +943,6 @@ final public class VideoHandler
 	/**
 	 * 预览辅流 是小窗口为远端
 	 * 
-	 * @since 1.1
-	 * @history 2013-9-23 v1.0.0 cWX176935 create
 	 * @deprecated
 	 */
 	public void changeLocaltoRemote()
@@ -974,8 +968,6 @@ final public class VideoHandler
 	 * 
 	 * 接收共享
 	 * 
-	 * @since 1.1
-	 * @history 2013-9-30 v1.0.0 wWX183960 create
 	 */
 	public void remoteToBfcp()
 	{
@@ -994,8 +986,6 @@ final public class VideoHandler
 	 * 是否初始化
 	 * 
 	 * @return true 已经初始化
-	 * @since 1.1
-	 * @history 2013-9-26 v1.0.0 cWX176935 create
 	 */
 	public boolean isInit()
 	{
@@ -1006,8 +996,6 @@ final public class VideoHandler
 	 * 获取BFCPrender
 	 * 
 	 * @return
-	 * @since 1.1
-	 * @history 2013-9-30 v1.0.0 wWX183960 create
 	 */
 	public SurfaceView getRemoteBfcpView()
 	{
@@ -1091,5 +1079,4 @@ final public class VideoHandler
 	{
 		return cameraCapacity.get(cameraIndex);
 	}
-
 }

@@ -165,9 +165,6 @@ public class VariationView extends RelativeLayout
 
 	/**
 	 * 控制render移动缩放量
-	 * 
-	 * @author cWX176935
-	 *
 	 */
 	private static class VariationParam {
 		protected float transX;

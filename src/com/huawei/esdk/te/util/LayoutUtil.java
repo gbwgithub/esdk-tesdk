@@ -503,8 +503,6 @@ public final class LayoutUtil
 	 *            要显示文字
 	 * @param len
 	 *            规定的长度
-	 * @since 1.1
-	 * @history 2013-11-1 v1.0.0 cWX176935 create
 	 */
 	public static void setEndEllipse(final TextView textView, final String str, int len)
 	{

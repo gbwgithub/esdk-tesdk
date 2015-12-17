@@ -94,7 +94,6 @@ public final class DeviceUtil
 	/**
 	 * Function: 获取MacAddress
 	 * 
-	 * @author luotianjia 00186254/huawei
 	 * @param context
 	 * @return String
 	 */
