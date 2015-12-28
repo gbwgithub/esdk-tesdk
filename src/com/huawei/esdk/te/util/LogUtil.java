@@ -25,8 +25,9 @@ public class LogUtil
 	private static char MYLOG_TYPE = 'v';
 	// 日志文件在的路径,默认在sdcard中
 	private static String MYLOG_PATH_DIR = "/sdcard/TEMobile/log";
+//	private static String MYLOG_PATH_DIR = getFilesDir().getPath() + "/log/";
 	private static int SDCARD_LOG_FILE_SAVE_DAYS = 0;// sd卡中日志文件的最多保存天数
-	private static String MYLOGFILEName = "Log.txt";// 本类输出的日志文件名称
+	private static String MYLOGFILEName = "eSDKLog.txt";// 本类输出的日志文件名称
 	private static SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 日志的输出格式
 	private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-MM-dd");// 日志文件格式
 
@@ -34,9 +35,13 @@ public class LogUtil
 	{
 		Log.d("LogUtil", "setLogSwitch() -> " + logSwitch);
 		MYLOG_SWITCH = logSwitch;
-		if (null != TESDK.getInstance())
+		if (null != TESDK.getInstance() && null != TESDK.getInstance().getLogPath() && 0 != TESDK.getInstance().getLogPath().length())
 		{
 			MYLOG_PATH_DIR = TESDK.getInstance().getLogPath();
+			if (MYLOG_PATH_DIR.charAt((MYLOG_PATH_DIR.length() - 1)) == '/')
+			{
+				MYLOG_PATH_DIR = MYLOG_PATH_DIR.substring(0, MYLOG_PATH_DIR.length() - 1);
+			}
 		}
 	}
 
@@ -119,9 +124,10 @@ public class LogUtil
 			{
 				Log.v(tag, msg);
 			}
-			if (MYLOG_WRITE_TO_FILE){
-				//写入文件目前有BUG，带修复
-				//writeLogtoFile(String.valueOf(level), tag, msg);
+			if (MYLOG_WRITE_TO_FILE)
+			{
+				// 写入文件目前有BUG，待修复
+				writeLogtoFile(String.valueOf(level), tag, msg);
 			}
 		}
 	}
@@ -135,7 +141,7 @@ public class LogUtil
 		Date nowtime = new Date();
 		String needWriteFiel = logfile.format(nowtime);
 		String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag + "    " + text;
-		d("LogUtil", "writeLogtoFile path -> " + MYLOG_PATH_DIR + "/" + needWriteFiel + MYLOGFILEName);
+		//		Log.d("LogUtil - for test", "writeLogtoFile path -> " + MYLOG_PATH_DIR + "/" + needWriteFiel + MYLOGFILEName);
 		File file = new File(MYLOG_PATH_DIR, needWriteFiel + MYLOGFILEName);
 		try
 		{

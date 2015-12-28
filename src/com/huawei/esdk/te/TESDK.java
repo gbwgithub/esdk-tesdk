@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.huawei.application.BaseApp;
 import com.huawei.common.LogSDK;
@@ -51,7 +50,7 @@ public class TESDK
 	 */
 	private static String SDK_BROADCAST_PERMISSION = "com.huawei.TEMobile";
 
-	private static String SDK_LOG_DIR = "/TESDKLog";
+	private static String SDK_LOG_DIR = "/log/";
 
 	private static TESDK instance;
 
@@ -137,7 +136,7 @@ public class TESDK
 		// 设置Log开关与路径
 		this.debugSwitch = debugSwitch;
 		this.logPath = path;
-		if (null != path && "".equals(path))
+		if (null != path && !("".equals(path)))
 		{
 			this.logPath = path;
 		}
@@ -352,8 +351,24 @@ public class TESDK
 		}
 	}
 
-	public void login(final LoginParameter loginParameter)
+	public boolean login(final LoginParameter loginParameter)
 	{
+		LogUtil.i(TAG, "login()");
+		LogUtil.i(TAG, "loginParameter -> CallBandWidth:" + loginParameter.getCallBandWidth());
+		LogUtil.i(TAG, "loginParameter -> CT :" + loginParameter.getCT());
+		LogUtil.i(TAG, "loginParameter -> EncryptMode :" + loginParameter.getEncryptMode());
+		LogUtil.i(TAG, "loginParameter -> IsILBCPri :" + loginParameter.getIsILBCPri());
+		LogUtil.i(TAG, "loginParameter -> LicenseServer :" + loginParameter.getLicenseServer());
+		LogUtil.i(TAG, "loginParameter -> LoginName :" + loginParameter.getLoginName());
+		LogUtil.i(TAG, "loginParameter -> LoginPwd :" + loginParameter.getLoginPwd());
+		LogUtil.i(TAG, "loginParameter -> MediaPort :" + loginParameter.getMediaPort());
+		LogUtil.i(TAG, "loginParameter -> ProtocolType :" + loginParameter.getProtocolType());
+		LogUtil.i(TAG, "loginParameter -> ServerIP :" + loginParameter.getServerIP());
+		LogUtil.i(TAG, "loginParameter -> ServerPort :" + loginParameter.getServerPort());
+		LogUtil.i(TAG, "loginParameter -> Sipuri :" + loginParameter.getSipuri());
+		LogUtil.i(TAG, "loginParameter -> VideoMode :" + loginParameter.getVideoMode());
+		LogUtil.i(TAG, "loginParameter -> AutoLogin :" + loginParameter.isAutoLogin());
+		LogUtil.i(TAG, "loginParameter -> BfcpEnable :" + loginParameter.isBfcpEnable());
 		// 注册锁屏广播，用以解决视频通话中锁屏的问题
 		instance.registerScreenActionReceiver(application);
 
@@ -376,8 +391,8 @@ public class TESDK
 		// 如果网络问题无法登录做提示
 		if (!DeviceManager.isNetworkAvailable(application))
 		{
-			Toast.makeText(application, "网络已断开", Toast.LENGTH_SHORT).show();
-			return;
+			LogUtil.e(TAG, "网络已断开");
+			return false;
 		}
 
 		Constants.setAnonymousAccount(isAnonymous);
@@ -400,6 +415,7 @@ public class TESDK
 				}, false);
 			}
 		}).run();
+		return true;
 	}
 
 	private ServiceConnection mImServiceConn = new ServiceConnection()
@@ -609,7 +625,6 @@ public class TESDK
 		{
 			// 退出时去初始化Datamanager
 			DataManager.getIns().uninit();
-			stopSDKService();
 		}
 		LogUtil.i(TAG, "exit app.");
 	}

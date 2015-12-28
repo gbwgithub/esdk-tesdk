@@ -3,13 +3,16 @@ package com.huawei.esdk.te.call;
 import java.util.List;
 
 import object.StreamInfo;
+import android.nfc.Tag;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.esdk.te.video.VideoHandler;
 
 public class CallService
 {
+	private static String TAG = CallService.class.getSimpleName();
 
 	private static CallService instance = new CallService();
 
@@ -20,11 +23,15 @@ public class CallService
 
 	public void registerNotification(CallNotification listener)
 	{
+		LogUtil.i(TAG, "registerNotification()");
+		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().registerNotification(listener);
 	}
 
 	public void unregisterNotification(CallNotification listener)
 	{
+		LogUtil.i(TAG, "unregisterNotification()");
+		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().unRegisterNotification(listener);
 	}
 
@@ -41,6 +48,10 @@ public class CallService
 	 */
 	public String dialCall(String calleeNumber, String domain, boolean isVideoCall)
 	{
+		LogUtil.i(TAG, "dialCall()");
+		LogUtil.i(TAG, "calleeNumber -> " + calleeNumber);
+		LogUtil.i(TAG, "domain -> " + domain);
+		LogUtil.i(TAG, "isVideoCall -> " + isVideoCall);
 		return CallLogic.getInstance().dialCall(calleeNumber, domain, isVideoCall);
 	}
 
@@ -57,6 +68,9 @@ public class CallService
 	 */
 	public boolean callAnswer(String callId, boolean isVideo)
 	{
+		LogUtil.i(TAG, "callAnswer()");
+		LogUtil.i(TAG, "callId -> " + callId);
+		LogUtil.i(TAG, "isVideo -> " + isVideo);
 		return CallLogic.getInstance().callAnswer(callId, isVideo);
 	}
 
@@ -69,6 +83,8 @@ public class CallService
 	 */
 	public boolean rejectCall(String callId)
 	{
+		LogUtil.i(TAG, "rejectCall()");
+		LogUtil.i(TAG, "callId -> " + callId);
 		return CallLogic.getInstance().rejectCall(callId);
 	}
 
@@ -79,11 +95,15 @@ public class CallService
 	 */
 	public synchronized boolean closeCall()
 	{
+		LogUtil.i(TAG, "closeCall()");
 		return CallLogic.getInstance().closeCall();
 	}
 
 	public boolean openBFCPReceive(ViewGroup localVideoView, ViewGroup remoteVideoView)
 	{
+		LogUtil.i(TAG, "openBFCPReceive()");
+		LogUtil.i(TAG, "localVideoView -> " + localVideoView);
+		LogUtil.i(TAG, "remoteVideoView -> " + remoteVideoView);
 		return CallLogic.getInstance().openBFCPReceive(localVideoView, remoteVideoView);
 	}
 
@@ -95,6 +115,8 @@ public class CallService
 	 */
 	public void openLocalPreview(ViewGroup preViewContain)
 	{
+		LogUtil.i(TAG, "openLocalPreview()");
+		LogUtil.i(TAG, "preViewContain -> " + preViewContain);
 		if (!VideoHandler.getIns().isInit())
 		{
 			VideoHandler.getIns().initCallVideo();
@@ -114,7 +136,10 @@ public class CallService
 	 */
 	public void openCallVideo(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
 	{
-
+		LogUtil.i(TAG, "openCallVideo()");
+		LogUtil.i(TAG, "localViewContain -> " + localViewContain);
+		LogUtil.i(TAG, "remoteViewContain -> " + remoteViewContain);
+		LogUtil.i(TAG, "isLocal -> " + isLocal);
 		View remoteVV = VideoHandler.getIns().getRemoteCallView();
 		if (null != remoteVV && null == remoteVV.getParent())
 		{
@@ -132,6 +157,8 @@ public class CallService
 	 */
 	public boolean localCameraControl(boolean isCloseAction)
 	{
+		LogUtil.i(TAG, "localCameraControl()");
+		LogUtil.i(TAG, "isCloseAction -> " + isCloseAction);
 		CallLogic.getInstance().setUserCloseLocalCamera(isCloseAction);
 		return CallLogic.getInstance().localCameraControl(isCloseAction);
 	}
@@ -141,6 +168,7 @@ public class CallService
 	 */
 	public boolean switchCamera()
 	{
+		LogUtil.i(TAG, "switchCamera()");
 		return VideoHandler.getIns().switchCamera();
 	}
 
@@ -153,6 +181,7 @@ public class CallService
 	 */
 	public boolean agreeUpgradeVideo()
 	{
+		LogUtil.i(TAG, "agreeUpgradeVideo()");
 		return CallLogic.getInstance().agreeUpgradeVideo();
 	}
 
@@ -163,6 +192,7 @@ public class CallService
 	 */
 	public boolean rejectUpgradeVideo()
 	{
+		LogUtil.i(TAG, "rejectUpgradeVideo()");
 		return CallLogic.getInstance().rejectUpgradeVideo();
 	}
 
@@ -175,6 +205,7 @@ public class CallService
 	 */
 	public boolean upgradeVideo()
 	{
+		LogUtil.i(TAG, "upgradeVideo()");
 		return CallLogic.getInstance().upgradeVideo();
 	}
 
@@ -183,6 +214,7 @@ public class CallService
 	 */
 	public boolean closeVideo()
 	{
+		LogUtil.i(TAG, "closeVideo()");
 		return CallLogic.getInstance().closeVideo();
 	}
 
@@ -194,6 +226,8 @@ public class CallService
 	 */
 	public boolean sendDTMF(String code)
 	{
+		LogUtil.i(TAG, "sendDTMF()");
+		LogUtil.i(TAG, "code -> " + code);
 		boolean ret = CallLogic.getInstance().reDial(code);
 		return ret;
 	}
@@ -208,6 +242,9 @@ public class CallService
 	 */
 	public boolean setLocalMute(boolean isRefer, boolean isMute)
 	{
+		LogUtil.i(TAG, "setLocalMute()");
+		LogUtil.i(TAG, "isRefer -> " + isRefer);
+		LogUtil.i(TAG, "isMute -> " + isMute);
 		return CallLogic.getInstance().setLocalMute(isRefer, isMute);
 	}
 
@@ -216,6 +253,8 @@ public class CallService
 	 */
 	public boolean oratorMute(boolean isMute)
 	{
+		LogUtil.i(TAG, "oratorMute()");
+		LogUtil.i(TAG, "isMute -> " + isMute);
 		return CallLogic.getInstance().oratorMute(isMute);
 	}
 
@@ -224,6 +263,7 @@ public class CallService
 	 */
 	public boolean changeAudioRoute()
 	{
+		LogUtil.i(TAG, "changeAudioRoute()");
 		return CallLogic.getInstance().changeAudioRoute();
 	}
 
@@ -237,15 +277,40 @@ public class CallService
 	 */
 	public void setCameraDegree(int cameraRotation, int localRotation)
 	{
+		LogUtil.i(TAG, "setCameraDegree()");
+		LogUtil.i(TAG, "cameraRotation -> " + cameraRotation);
+		LogUtil.i(TAG, "localRotation -> " + localRotation);
 		CallLogic.getInstance().setCameraDegree(cameraRotation, localRotation);
 	}
-	
+
 	/**
 	 * 向sdk层设置媒体带宽参数并使其生效 带宽等于64时禁用BFCP
 	 */
 	public boolean setBandwidth(int bw)
 	{
+		LogUtil.i(TAG, "setBandwidth()");
+		LogUtil.i(TAG, "bw -> " + bw);
 		return CallLogic.getInstance().setFastBandwidth(bw);
+	}
+
+	/**
+	 * 设置视频模式 流畅优先 -> VIDEO_PROCESS_MODE = 1 画质优先 -> VIDEO_QUALITY_MODE = 0
+	 */
+	public boolean setVideoMode(int videoMode)
+	{
+		LogUtil.i(TAG, "setVideoMode()");
+		LogUtil.i(TAG, "videoMode -> " + videoMode);
+		return VideoHandler.getIns().setVideoMode(videoMode);
+	}
+
+	/**
+	 * 设置SRTP，安全传输协议：2：加密 3:非强制性加密(最大互通性) 1：不加密
+	 */
+	public boolean setEncryptMode(int encryptMode)
+	{
+		LogUtil.i(TAG, "setEncryptMode()");
+		LogUtil.i(TAG, "encryptMode -> " + encryptMode);
+		return VideoHandler.getIns().setEncryptMode(encryptMode);
 	}
 
 	/**
@@ -253,6 +318,7 @@ public class CallService
 	 */
 	public void forceCloseCall()
 	{
+		LogUtil.i(TAG, "forceCloseCall()");
 		CallLogic.getInstance().forceCloseCall();
 	}
 

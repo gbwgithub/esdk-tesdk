@@ -14,7 +14,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.huawei.application.BaseApp;
 import com.huawei.common.CallErrorCode;
@@ -496,7 +495,6 @@ public class CallLogic
 			return callid;
 		} else
 		{
-
 			// 重置路由
 			resetAudioRoute(isVideoCall);
 
@@ -716,7 +714,6 @@ public class CallLogic
 	public boolean agreeUpgradeVideo()
 	{
 		VideoCaps caps = (VideoCaps) VideoHandler.getIns().initCallVideo();
-		Toast.makeText(BaseApp.getApp(), "getCameraRotation -> " + caps.getCameraRotation(), Toast.LENGTH_LONG).show();
 		LogUtil.d(TAG, "getCameraRotation -> " + caps.getCameraRotation());
 		VideoCaps dataCaps = VideoHandler.getIns().getDataCaps();
 

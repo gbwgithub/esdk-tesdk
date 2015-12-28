@@ -16,7 +16,7 @@ public interface CallNotification {
 	//接收到对方挂断消息，但还没有执行挂断操作，用于获取挂断原因
 	public abstract void onCallend(Call currentCall);
 
-	//协商结果处理
+	//协商结果处理 (用来接收是否有辅流能力)
 	public abstract void onDataReady(int callId, int bfcpRet);
 	
 	//对方音视频转换的响应通知

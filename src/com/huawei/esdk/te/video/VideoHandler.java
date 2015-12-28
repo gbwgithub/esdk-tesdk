@@ -42,8 +42,6 @@ final public class VideoHandler
 
 	private Handler uiHandler = null;
 
-	private boolean isRenderRemoveDone = true;
-
 	/**
 	 * render控制锁
 	 */
@@ -82,22 +80,10 @@ final public class VideoHandler
 	/** 远端辅流画面 */
 	private SurfaceView remoteBfcpView;
 
-	// 振铃崩溃，清除HMERender
 	/**
 	 * 远端视频
 	 */
 	private RelativeLayout remoteVideoView;
-	// 振铃崩溃，清除HMERender
-
-	// /*
-	// * 本端窗口矩形
-	// */
-	// private VideoViewRect localViewRect = null;
-	//
-	// /*
-	// * 远端大窗口矩形
-	// */
-	// private VideoViewRect remoteBigViewRect = null;
 
 	/** 本地视频视图句柄 */
 	private int localCallIndex;
@@ -125,7 +111,6 @@ final public class VideoHandler
 	private static VideoHandler ins;
 	// 增加视频参数
 	private VideoCaps videoCaps = new VideoCaps(false, false);
-	// 增加视频参数
 	// 辅流的caps
 	private VideoCaps dataCaps = new VideoCaps(false, true);
 
@@ -244,9 +229,6 @@ final public class VideoHandler
 		// 获取远端辅流视频句柄，用于视频设备的绑定（绑定哪个设备，就显示哪个设备的视频）
 		remoteBfcpIndex = ViERenderer.getIndexOfSurface(remoteBfcpView);
 
-		// remoteCallSmallIndex =
-		// ViERenderer.getIndexOfSurface(remoteCallSmallView);
-
 		// 获取本地辅流视频句柄，用于视频设备的绑定（绑定哪个设备，就显示哪个设备的视频）
 		localBfcpIndex = ViERenderer.getIndexOfSurface(localBfcpView);
 
@@ -292,7 +274,6 @@ final public class VideoHandler
 
 		dataCaps.setPlaybackLocal(localBfcpIndex);
 		dataCaps.setPlaybackRemote(remoteBfcpIndex);
-		// dataCaps.setBandWidth(bandWidth);
 		return videoCaps;
 	}
 
@@ -315,7 +296,6 @@ final public class VideoHandler
 			@Override
 			public void run()
 			{
-				// TODO Auto-generated method stub
 				if (!hasCheckCamera)
 				{
 					calcCameraAbility();
@@ -338,7 +318,6 @@ final public class VideoHandler
 	/**
 	 * 获取后置摄像头能力
 	 * 
-	 * @param context
 	 * @return CameraInfo 数组
 	 */
 	public int[] getBackCameraInfo(Context context)
@@ -411,10 +390,6 @@ final public class VideoHandler
 
 	}
 
-	/*************************************** 会议中视频相关 ***************************************/
-
-	/*************************************** 会议中视频相关 ***************************************/
-
 	/**
 	 * 切换摄像头
 	 */
@@ -445,11 +420,7 @@ final public class VideoHandler
 		videoCaps.setCameraIndex(cameraIndex);
 		if (cameraIndex == BACK_CAMERA)
 		{
-			videoCaps.setCameraRotation(OrieantationUtil.getIns().calcCamOrieantation(cameraIndex));
 			videoCaps.setLocalRoate(0);
-		} else if (CallLogic.getInstance().getVoipStatus() == CallStatus.STATUS_VIDEOINIT)
-		{
-			videoCaps.setCameraRotation(OrieantationUtil.getIns().calcCamOrieantation(cameraIndex));
 		}
 		// 切换摄像头
 		if (callLogic.switchCamera(getCaps()))
@@ -534,8 +505,6 @@ final public class VideoHandler
 			 */
 			private void clearHMERendr()
 			{
-				// if
-				// (ConfigAccount.getIns().getLoginAccount().isSupportVideo()) {
 				addViewToContain(localCallView, remoteVideoView);
 				if (null != remoteVideoView)
 				{
@@ -634,18 +603,11 @@ final public class VideoHandler
 		return numberOfCameras > 1;
 	}
 
-	/**
-	 * @return the dataCaps
-	 */
 	public VideoCaps getDataCaps()
 	{
 		return dataCaps;
 	}
 
-	/**
-	 * @param dataCaps
-	 *            the dataCaps to set
-	 */
 	public void setDataCaps(VideoCaps dataCaps)
 	{
 		this.dataCaps = dataCaps;
@@ -703,57 +665,6 @@ final public class VideoHandler
 		remoteTurnDirc = -1;
 		curTurnDegree = 0;
 	}
-
-	/**
-	 * @param degree
-	 * @param isfront
-	 * @return
-	 */
-	private int getVideoChangeOrientation(int degree, boolean isfront)
-	{
-		// int currentCameraOrientation =
-		// CommonManager.getInstance().getVoip().getCameraOrientation(VideoHandler.getIns().getCameraType());
-		int resultDirc = -1;
-
-		// 注意: 魅族手机与寻常手机不一致.需要分别做判断.正常手机采用下面方法即可
-		// 以30度为基准
-		// 0
-		if (0 <= degree && degree < 60 || (330 <= degree && degree <= 360))
-		{
-			resultDirc = 0;
-		}
-		// 90
-		else if (60 <= degree && degree <= 120)
-		{
-			resultDirc = 1;
-		}
-		// 180
-		else if (150 <= degree && degree <= 210)
-		{
-			resultDirc = 2;
-		}
-		// 270
-		else if (240 <= degree && degree <= 300)
-		{
-			resultDirc = 3;
-		}
-		return resultDirc;
-	}
-
-	// /**
-	// * 设置各个视频窗口大小
-	// *
-	// * @param localRect
-	// * @param remoteBigRect
-	// * @param remoteSmallRect
-	// */
-	// public void setVideoViewRect(VideoViewRect localRect, VideoViewRect
-	// remoteBigRect, VideoViewRect remoteSmallRect) {
-	// localViewRect = localRect;
-	// remoteBigViewRect = remoteBigRect;
-	//
-	// videoCaps.setLocalRenderRect(localViewRect);
-	// }
 
 	/**
 	 * 设置目前使用的窗口
@@ -868,7 +779,6 @@ final public class VideoHandler
 				} else
 				{
 					LocalHideRenderServer.getInstance().addView(localHI);
-					isRenderRemoveDone = true;
 
 					// 刷新下view
 					// reason：新增程序后台运行的时候关闭摄像头，回来的时候要打开，在开打的时候偶现本远端画面出现黑屏，只有在本远端切换的时候才能恢复
@@ -1079,4 +989,34 @@ final public class VideoHandler
 	{
 		return cameraCapacity.get(cameraIndex);
 	}
+
+	public boolean setVideoMode(int videoMode)
+	{
+		LogUtil.i(TAG, "change video Mode:[ " + videoMode + ']');
+
+		// 获取当前视频caps
+		VideoCaps caps = VideoHandler.getIns().getCaps();
+		if (null == caps)
+		{
+			LogUtil.e(TAG, "caps is null !");
+			return false;
+		}
+
+		// 重新设置视频分辨率
+		eSpaceService.getService().callManager.resetVideoCaps(caps);
+		eSpaceService.getService().callManager.setVideoMode(videoMode);
+
+		return true;
+	}
+
+	public boolean setEncryptMode(int encryptMode)
+	{
+		LogUtil.i(TAG, "change encrypt Mode:[" + encryptMode + ']');
+		// VOIPConfigParamsData中加密模式用于重新设置呼叫加密能力
+		eSpaceService.getService().callManager.getVoipConfig().setEncryptMode(encryptMode);
+		eSpaceService.getService().callManager.getTupManager().setMediaEncryptMode();
+
+		return true;
+	}
+
 }
