@@ -663,7 +663,6 @@ public class VariationView extends RelativeLayout
 
 	@Override
 	public void addView(View child) {
-		// TODO Auto-generated method stub
 		super.addView(child);
 		if (null == srcBound && 0 != getMeasuredWidth()) {
 			srcBound = new Point(getMeasuredWidth(), getMeasuredHeight());

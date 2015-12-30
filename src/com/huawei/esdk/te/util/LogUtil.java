@@ -10,6 +10,7 @@ import java.util.Date;
 
 import android.util.Log;
 
+import com.huawei.esdk.log4Android.Log4Android;
 import com.huawei.esdk.te.TESDK;
 
 /**
@@ -17,6 +18,10 @@ import com.huawei.esdk.te.TESDK;
  */
 public class LogUtil
 {
+
+	public final static String product = "TE-API-Android";
+	private final static String format = "yyyy-MM-dd HH:mm:ss SSS";
+
 	// 日志文件总开关
 	private static Boolean MYLOG_SWITCH = false;
 	// 日志写入文件开关
@@ -25,7 +30,7 @@ public class LogUtil
 	private static char MYLOG_TYPE = 'v';
 	// 日志文件在的路径,默认在sdcard中
 	private static String MYLOG_PATH_DIR = "/sdcard/TEMobile/log";
-//	private static String MYLOG_PATH_DIR = getFilesDir().getPath() + "/log/";
+	// private static String MYLOG_PATH_DIR = getFilesDir().getPath() + "/log/";
 	private static int SDCARD_LOG_FILE_SAVE_DAYS = 0;// sd卡中日志文件的最多保存天数
 	private static String MYLOGFILEName = "eSDKLog.txt";// 本类输出的日志文件名称
 	private static SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 日志的输出格式
@@ -49,6 +54,17 @@ public class LogUtil
 	{
 		Log.d("LogUtil", "getLogSwitch() -> " + MYLOG_SWITCH);
 		return MYLOG_SWITCH;
+	}
+
+	public static void Log4Android(String protocolType, String interfaceName, String sourceAddr, String targetAddr, String transactionID, String reqTime,
+			String respTime, String resultCode, String params)
+	{
+		if (null != reqTime && "".equals(reqTime))
+		{
+			reqTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
+		}
+		Log4Android.getInstance().logInterfaceInfo(product, "2", protocolType, interfaceName, sourceAddr, targetAddr, transactionID, reqTime, respTime,
+				resultCode, params);
 	}
 
 	public static void w(String tag, Object msg)
@@ -141,7 +157,8 @@ public class LogUtil
 		Date nowtime = new Date();
 		String needWriteFiel = logfile.format(nowtime);
 		String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag + "    " + text;
-		//		Log.d("LogUtil - for test", "writeLogtoFile path -> " + MYLOG_PATH_DIR + "/" + needWriteFiel + MYLOGFILEName);
+		// Log.d("LogUtil - for test", "writeLogtoFile path -> " +
+		// MYLOG_PATH_DIR + "/" + needWriteFiel + MYLOGFILEName);
 		File file = new File(MYLOG_PATH_DIR, needWriteFiel + MYLOGFILEName);
 		try
 		{

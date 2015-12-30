@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">TESDK</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     
     
@@ -333,7 +331,7 @@
     <string name="switch_audio">Switch Audio</string>
 
     <!-- system tip -->
-    <string name="infotip" xml:space="preserve">\t\t\t\t\t\t</string>
+    <string name="infotip">\t\t\t\t\t\t</string>
     <string name="etimeout">Login timed out. Please check the network</string>
     <string name="network_on">Connected</string>
     <string name="network_off">Disconnected</string>

@@ -1,7 +1,10 @@
 package com.huawei.esdk.te;
 
 import java.io.File;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -24,6 +27,7 @@ import com.huawei.common.Resource;
 import com.huawei.ecs.mtk.log.AndroidLogger;
 import com.huawei.ecs.mtk.log.LogLevel;
 import com.huawei.ecs.mtk.log.Logger;
+import com.huawei.esdk.log4Android.Log4Android;
 import com.huawei.esdk.te.call.CallConstants.CallStatus;
 import com.huawei.esdk.te.call.CallLogic;
 import com.huawei.esdk.te.data.Constants;
@@ -42,7 +46,6 @@ import com.huawei.voip.data.LoginInfo;
 
 public class TESDK
 {
-
 	private static final String TAG = TESDK.class.getSimpleName();
 	/**
 	 * 用于限定SDK的广播接受者域 . 目前使用"com.huawei.TEMobile" 注意 ： 此处配置字符串 要和
@@ -73,6 +76,44 @@ public class TESDK
 	{
 		BaseApp.setApp(app);
 		instance = new TESDK(app);
+		System.loadLibrary("Log4Android");
+		Log4Android.setContext(app);
+		LogUtil.d(TAG, "Log4Android isWIFIConnect -> " + Log4Android.isWIFIConnect());
+
+		InputStream is = app.getClass().getResourceAsStream("/com/huawei/esdk/log4Android/eSDKClientLogCfg.ini");
+		String fileContents = new String(Log4Android.InputStreamToByte(is));
+
+		Log.d(TAG, "Log4Android fileContents -> " + fileContents);
+		Log.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, 0, "/sdcard/TEMobile/log"));
+		Log4Android.getInstance().setCallBackMethod();
+		Log4Android.getInstance().setSendLogStrategy(0, 2, "172.22.9.38:9086");
+		Log4Android.getInstance().initMobileLog(LogUtil.product);
+
+		LogUtil.Log4Android("", TAG + "." + "initSDK", "", "", "", "", "", "", app.toString());
+
+		// String reqTime = String.format("[%s]", new
+		// SimpleDateFormat(format).format(new Date()));
+		// Log4Android.getInstance().logInterfaceInfo(product, "1", "",
+		// "TESDK.initSDK", "", "", "", reqTime, "", "", "");
+
+		// Log4Android.getInstance().logInterfaceError(product, "2", "HTTP+XML",
+		// "TESTERROR", "", "", "", "2015-12-10", "2015-12-10", "aa", "bb");
+
+
+
+		// // 成功
+		// Log4Android.getInstance().logInterfaceInfo(product, "2", "HTTP+XML",
+		// "Authentic.login", "", "", "", reqTime, RespTime, "" + loginFlag,
+		// "userId:" + userId + ",userPwd:" + userPwd + ",userType:" +
+		// userType);
+		// // 失败
+		// Log4Android.getInstance().logInterfaceError(product, "2", "HTTP+XML",
+		// "Authentic.login", "", "", "", reqTime, RespTime, "" + loginFlag,
+		// "userId:" + userId + ",userPwd:" + userPwd + ",userType:" +
+		// userType);
+		//
+		// // 运行接口
+		// Log4Android.getInstance().logRunDebug(product, "login excuted");
 	}
 
 	private TESDK(Application app)
@@ -113,7 +154,7 @@ public class TESDK
 	{
 		if (null == instance)
 		{
-			LogUtil.e(TAG, "TESDK didn't init");
+			Log.e(TAG, "TESDK didn't init");
 		}
 		return instance;
 	}
@@ -171,14 +212,14 @@ public class TESDK
 	 */
 	private void setFastLog(boolean logSwitch)
 	{
-		LogUtil.d(TAG, "setFastLog");
+		Log.d(TAG, "setFastLog");
 		if (mService != null)
 		{
-			LogUtil.d(TAG, "setFastLog:" + logPath);
+			Log.d(TAG, "setFastLog:" + logPath);
 			mService.setLogSwitch(logPath, logSwitch);
 			return;
 		}
-		LogUtil.d(TAG, "setFastLog Failed -> service is null.");
+		Log.e(TAG, "setFastLog Failed -> service is null.");
 	}
 
 	/**
@@ -325,6 +366,7 @@ public class TESDK
 	 */
 	public void stopSDKService()
 	{
+		LogUtil.Log4Android("", TAG + "." + "stopSDKService", "", "", "", "", "", "", "");
 		synchronized (SERVICE_LOCK)
 		{
 			LogUtil.i(TAG, "stopImServiceIfInactive enter.");
@@ -353,6 +395,7 @@ public class TESDK
 
 	public boolean login(final LoginParameter loginParameter)
 	{
+		LogUtil.Log4Android("", TAG + "." + "login", "", "", "", "", "", "", loginParameter.toString());
 		LogUtil.i(TAG, "login()");
 		LogUtil.i(TAG, "loginParameter -> CallBandWidth:" + loginParameter.getCallBandWidth());
 		LogUtil.i(TAG, "loginParameter -> CT :" + loginParameter.getCT());
@@ -501,6 +544,7 @@ public class TESDK
 	 */
 	public void logout()
 	{
+		LogUtil.Log4Android("", TAG + "." + "logout", "", "", "", "", "", "", "");
 		if (getmService() != null)
 		{
 			new Handler().postDelayed(logoutWaitRunnable, 2000);
