@@ -1,12 +1,19 @@
-package com.huawei.esdk.te;
+/*
+ *    Copyright 2015 Huawei Technologies Co., Ltd. All rights reserved.
+ *    eSDK is licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
-import java.io.File;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Executors;
+package com.huawei.esdk.te;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -43,6 +50,12 @@ import com.huawei.utils.DeviceManager;
 import com.huawei.utils.StringUtil;
 import com.huawei.voip.CallManager.State;
 import com.huawei.voip.data.LoginInfo;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
 
 public class TESDK
 {
@@ -84,12 +97,108 @@ public class TESDK
 		String fileContents = new String(Log4Android.InputStreamToByte(is));
 
 		Log.d(TAG, "Log4Android fileContents -> " + fileContents);
-		Log.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, 0, "/sdcard/TEMobile/log"));
+		//日志初始化
+		int[] logLevel = {0, 0, 3};
+		Log.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, logLevel, "/sdcard/TEMobile/log"));
 		Log4Android.getInstance().setCallBackMethod();
 		Log4Android.getInstance().setSendLogStrategy(0, 2, "172.22.9.38:9086");
 		Log4Android.getInstance().initMobileLog(LogUtil.product);
 
 		LogUtil.Log4Android("", TAG + "." + "initSDK", "", "", "", "", "", "", app.toString());
+
+		// Log.d(TAG, "new Throwable().getStackTrace().length -> " + new
+		// Throwable().getStackTrace().length);
+		// new Throwable().printStackTrace();
+		//
+		// String clazzName0 = new
+		// Throwable().getStackTrace()[0].getClassName();
+		// Log.d(TAG, "new Throwable().getStackTrace()[0].getClassName() -> " +
+		// clazzName0);
+		//
+		// String funcName0 = new
+		// Throwable().getStackTrace()[0].getMethodName();
+		// Log.d(TAG, "new Throwable().getStackTrace()[0].getMethodName() -> " +
+		// funcName0);
+		//
+		// String clazzName1 = new
+		// Throwable().getStackTrace()[1].getClassName();
+		// Log.d(TAG, "new Throwable().getStackTrace()[1].getClassName() -> " +
+		// clazzName1);
+		//
+		// String funcName1 = new
+		// Throwable().getStackTrace()[1].getMethodName();
+		// Log.d(TAG, "new Throwable().getStackTrace()[1].getMethodName() -> " +
+		// funcName1);
+		//
+		// String clazzName2 = new
+		// Throwable().getStackTrace()[2].getClassName();
+		// Log.d(TAG, "new Throwable().getStackTrace()[2].getClassName() -> " +
+		// clazzName2);
+		//
+		// String funcName2 = new
+		// Throwable().getStackTrace()[2].getMethodName();
+		// Log.d(TAG, "new Throwable().getStackTrace()[2].getMethodName() -> " +
+		// funcName2);
+		//
+		// String clazzName00 =
+		// Thread.currentThread().getStackTrace()[0].getClassName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[0].getMethodName() -> " +
+		// clazzName00);
+		//
+		// String funcName00 =
+		// Thread.currentThread().getStackTrace()[0].getMethodName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[0].getMethodName() -> " +
+		// funcName00);
+		//
+		// String clazzName01 =
+		// Thread.currentThread().getStackTrace()[1].getClassName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[1].getMethodName() -> " +
+		// clazzName01);
+		//
+		// String funcName01 =
+		// Thread.currentThread().getStackTrace()[1].getMethodName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[1].getMethodName() -> " +
+		// funcName01);
+		//
+		// String clazzName02 =
+		// Thread.currentThread().getStackTrace()[2].getClassName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[2].getMethodName() -> " +
+		// clazzName02);
+		//
+		// String funcName02 =
+		// Thread.currentThread().getStackTrace()[2].getMethodName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[2].getMethodName() -> " +
+		// funcName02);
+		//
+		// String clazzName03 =
+		// Thread.currentThread().getStackTrace()[3].getClassName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[3].getMethodName() -> " +
+		// clazzName03);
+		//
+		// String funcName03 =
+		// Thread.currentThread().getStackTrace()[3].getMethodName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[3].getMethodName() -> " +
+		// funcName03);
+		//
+		// String clazzName04 =
+		// Thread.currentThread().getStackTrace()[4].getClassName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[4].getMethodName() -> " +
+		// clazzName04);
+		//
+		// String funcName04 =
+		// Thread.currentThread().getStackTrace()[4].getMethodName();
+		// Log.d(TAG,
+		// "Thread.currentThread().getStackTrace()[4].getMethodName() -> " +
+		// funcName04);
 
 		// String reqTime = String.format("[%s]", new
 		// SimpleDateFormat(format).format(new Date()));
@@ -98,7 +207,6 @@ public class TESDK
 
 		// Log4Android.getInstance().logInterfaceError(product, "2", "HTTP+XML",
 		// "TESTERROR", "", "", "", "2015-12-10", "2015-12-10", "aa", "bb");
-
 
 
 		// // 成功
@@ -166,11 +274,9 @@ public class TESDK
 
 	/**
 	 * 设置记录Log文件开关及路径
-	 * 
-	 * @param debugSwitch
-	 *            是否记录Log文件
-	 * @param path
-	 *            Log文件路径
+	 *
+	 * @param debugSwitch 是否记录Log文件
+	 * @param path        Log文件路径
 	 */
 	public void setLogPath(boolean debugSwitch, String path)
 	{
@@ -192,11 +298,7 @@ public class TESDK
 
 	/**
 	 * Function: 写日志总开关
-	 * 
-	 * @param logSwitch
-	 *            写SIP日志开关
-	 * @param log
-	 *            日志开关
+	 *
 	 * @return boolean true/ false
 	 */
 	private boolean logSwitch()
@@ -224,11 +326,9 @@ public class TESDK
 
 	/**
 	 * Logcat日志写入文件开关
-	 * 
-	 * @param debugSwitch
-	 *            是否写MAA日志
-	 * @param logPath
-	 *            日志路径 （打开，和关闭的路径应该一致）
+	 *
+	 * @param debugSwitch 是否写MAA日志
+	 * @param logPath     日志路径 （打开，和关闭的路径应该一致）
 	 */
 	private void saveLogcat(boolean debugSwitch, String logPath)
 	{
@@ -271,13 +371,10 @@ public class TESDK
 
 	/**
 	 * 方法名称：callWhenServiceConnected 方法描述：绑定服务后回调
-	 * 
-	 * @param target
-	 *            输入参数
-	 * @param callback
-	 *            输入参数
-	 * @param isAutoLogin
-	 *            输入参数 返回类型：void
+	 *
+	 * @param target      输入参数
+	 * @param callback    输入参数
+	 * @param isAutoLogin 输入参数 返回类型：void
 	 */
 	private void callWhenServiceConnected(Handler target, Runnable callback, boolean isAutoLogin)
 	{
@@ -308,7 +405,7 @@ public class TESDK
 
 	/**
 	 * Function: 判断当前的Service 是否已经绑定上
-	 * 
+	 *
 	 * @return boolean
 	 */
 	private boolean serviceConnected()
