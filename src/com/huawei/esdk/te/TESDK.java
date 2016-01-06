@@ -87,6 +87,7 @@ public class TESDK
 
 	public static void initSDK(Application app)
 	{
+		LogUtil.in();
 		BaseApp.setApp(app);
 		instance = new TESDK(app);
 		System.loadLibrary("Log4Android");
@@ -96,7 +97,7 @@ public class TESDK
 		InputStream is = app.getClass().getResourceAsStream("/com/huawei/esdk/log4Android/eSDKClientLogCfg.ini");
 		String fileContents = new String(Log4Android.InputStreamToByte(is));
 
-		Log.d(TAG, "Log4Android fileContents -> " + fileContents);
+		LogUtil.d(TAG, "Log4Android fileContents -> " + fileContents);
 		//日志初始化
 		int[] logLevel = {0, 0, 3};
 		Log.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, logLevel, "/sdcard/TEMobile/log"));
@@ -104,8 +105,9 @@ public class TESDK
 		Log4Android.getInstance().setSendLogStrategy(0, 2, "172.22.9.38:9086");
 		Log4Android.getInstance().initMobileLog(LogUtil.product);
 
-		LogUtil.Log4Android("", TAG + "." + "initSDK", "", "", "", "", "", "", app.toString());
-
+//		LogUtil.log4Android("", TAG + "." + "initSDK", "", "", "", "", "", "", app.toString());
+		LogUtil.out("", "app -> " + app.toString());
+		
 		// Log.d(TAG, "new Throwable().getStackTrace().length -> " + new
 		// Throwable().getStackTrace().length);
 		// new Throwable().printStackTrace();
@@ -280,6 +282,7 @@ public class TESDK
 	 */
 	public void setLogPath(boolean debugSwitch, String path)
 	{
+		LogUtil.in();
 		// 设置Log开关与路径
 		this.debugSwitch = debugSwitch;
 		this.logPath = path;
@@ -289,6 +292,7 @@ public class TESDK
 		}
 		// 执行设置Log开关
 		logSwitch();
+		LogUtil.out("", "debugSwitch -> " + debugSwitch + "  path" + path);
 	}
 
 	public String getLogPath()
@@ -463,7 +467,8 @@ public class TESDK
 	 */
 	public void stopSDKService()
 	{
-		LogUtil.Log4Android("", TAG + "." + "stopSDKService", "", "", "", "", "", "", "");
+		LogUtil.in();
+//		LogUtil.log4Android("", TAG + "." + "stopSDKService", "", "", "", "", "", "", "");
 		synchronized (SERVICE_LOCK)
 		{
 			LogUtil.i(TAG, "stopImServiceIfInactive enter.");
@@ -488,11 +493,13 @@ public class TESDK
 
 			LogUtil.i(TAG, "stopImServiceIfInactive leave.");
 		}
+		LogUtil.out("", "");
 	}
 
 	public boolean login(final LoginParameter loginParameter)
 	{
-		LogUtil.Log4Android("", TAG + "." + "login", "", "", "", "", "", "", loginParameter.toString());
+		LogUtil.in();
+//		LogUtil.log4Android("", TAG + "." + "login", "", "", "", "", "", "", loginParameter.toString());
 		LogUtil.i(TAG, "login()");
 		LogUtil.i(TAG, "loginParameter -> CallBandWidth:" + loginParameter.getCallBandWidth());
 		LogUtil.i(TAG, "loginParameter -> CT :" + loginParameter.getCT());
@@ -532,6 +539,7 @@ public class TESDK
 		if (!DeviceManager.isNetworkAvailable(application))
 		{
 			LogUtil.e(TAG, "网络已断开");
+			LogUtil.out("false", "loginParameter -> " + loginParameter);
 			return false;
 		}
 
@@ -555,6 +563,7 @@ public class TESDK
 				}, false);
 			}
 		}).run();
+		LogUtil.out("true", "loginParameter -> " + loginParameter);
 		return true;
 	}
 
@@ -641,13 +650,15 @@ public class TESDK
 	 */
 	public void logout()
 	{
-		LogUtil.Log4Android("", TAG + "." + "logout", "", "", "", "", "", "", "");
+		LogUtil.in();
+//		LogUtil.log4Android("", TAG + "." + "logout", "", "", "", "", "", "", "");
 		if (getmService() != null)
 		{
 			new Handler().postDelayed(logoutWaitRunnable, 2000);
 			getmService().logout();
 			stopSDKService();
 		}
+		LogUtil.out("", "");
 		exit();
 	}
 

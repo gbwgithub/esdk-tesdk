@@ -18,7 +18,7 @@ package com.huawei.esdk.te.call;
 import java.util.List;
 
 import object.StreamInfo;
-import android.nfc.Tag;
+import android.R.integer;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -38,18 +38,25 @@ public class CallService
 
 	public void registerNotification(CallNotification listener)
 	{
-		LogUtil.Log4Android("", TAG + "." + "registerNotification", "", "", "", "", "", "", listener.toString());
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "registerNotification", "", "",
+		// "", "", "", "", listener.toString());
 		LogUtil.i(TAG, "registerNotification()");
 		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().registerNotification(listener);
+		LogUtil.out("void", "listener -> " + listener);
+		LogUtil.out("", "listener -> " + listener);
 	}
 
 	public void unregisterNotification(CallNotification listener)
 	{
-		LogUtil.Log4Android("", TAG + "." + "registerNotification", "", "", "", "", "", "", listener.toString());
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "unregisterNotification", "", "",
+		// "", "", "", "", listener.toString());
 		LogUtil.i(TAG, "unregisterNotification()");
 		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().unRegisterNotification(listener);
+		LogUtil.out("", "listener -> " + listener);
 	}
 
 	/**
@@ -65,12 +72,17 @@ public class CallService
 	 */
 	public String dialCall(String calleeNumber, String domain, boolean isVideoCall)
 	{
-		LogUtil.Log4Android("", TAG + "." + "dialCall", "", "", "", "", "", "", "calleeNumber -> " + calleeNumber + "  isVideoCall -> " + isVideoCall);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "dialCall", "", "", "", "", "",
+		// "", "calleeNumber -> " + calleeNumber + "  isVideoCall -> " +
+		// isVideoCall);
 		LogUtil.i(TAG, "dialCall()");
 		LogUtil.i(TAG, "calleeNumber -> " + calleeNumber);
 		LogUtil.i(TAG, "domain -> " + domain);
 		LogUtil.i(TAG, "isVideoCall -> " + isVideoCall);
-		return CallLogic.getInstance().dialCall(calleeNumber, domain, isVideoCall);
+		String ret = CallLogic.getInstance().dialCall(calleeNumber, domain, isVideoCall);
+		LogUtil.out(ret, "calleeNumber -> " + calleeNumber + "  isVideoCall -> " + isVideoCall);
+		return ret;
 	}
 
 	/**
@@ -86,11 +98,15 @@ public class CallService
 	 */
 	public boolean callAnswer(String callId, boolean isVideo)
 	{
-		LogUtil.Log4Android("", TAG + "." + "callAnswer", "", "", "", "", "", "", "callId -> " + callId + "  isVideo -> " + isVideo);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "callAnswer", "", "", "", "", "",
+		// "", "callId -> " + callId + "  isVideo -> " + isVideo);
 		LogUtil.i(TAG, "callAnswer()");
 		LogUtil.i(TAG, "callId -> " + callId);
 		LogUtil.i(TAG, "isVideo -> " + isVideo);
-		return CallLogic.getInstance().callAnswer(callId, isVideo);
+		boolean ret = CallLogic.getInstance().callAnswer(callId, isVideo);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "callId -> " + callId + "  isVideo -> " + isVideo);
+		return ret;
 	}
 
 	/**
@@ -102,10 +118,14 @@ public class CallService
 	 */
 	public boolean rejectCall(String callId)
 	{
-		LogUtil.Log4Android("", TAG + "." + "rejectCall", "", "", "", "", "", "", "callId -> " + callId);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "rejectCall", "", "", "", "", "",
+		// "", "callId -> " + callId);
 		LogUtil.i(TAG, "rejectCall()");
 		LogUtil.i(TAG, "callId -> " + callId);
-		return CallLogic.getInstance().rejectCall(callId);
+		boolean ret = CallLogic.getInstance().rejectCall(callId);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "callId -> " + callId);
+		return ret;
 	}
 
 	/**
@@ -115,18 +135,27 @@ public class CallService
 	 */
 	public synchronized boolean closeCall()
 	{
-		LogUtil.Log4Android("", TAG + "." + "closeCall", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "closeCall", "", "", "", "", "",
+		// "", "");
 		LogUtil.i(TAG, "closeCall()");
+		LogUtil.out("", "");
 		return CallLogic.getInstance().closeCall();
 	}
 
 	public boolean openBFCPReceive(ViewGroup localVideoView, ViewGroup remoteVideoView)
 	{
-		LogUtil.Log4Android("", TAG + "." + "openBFCPReceive", "", "", "", "", "", "", "localVideoView -> " + localVideoView + "  remoteVideoView -> " + remoteVideoView);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "openBFCPReceive", "", "", "",
+		// "", "", "", "localVideoView -> " + localVideoView +
+		// "  remoteVideoView -> "
+		// + remoteVideoView);
 		LogUtil.i(TAG, "openBFCPReceive()");
 		LogUtil.i(TAG, "localVideoView -> " + localVideoView);
 		LogUtil.i(TAG, "remoteVideoView -> " + remoteVideoView);
-		return CallLogic.getInstance().openBFCPReceive(localVideoView, remoteVideoView);
+		boolean ret = CallLogic.getInstance().openBFCPReceive(localVideoView, remoteVideoView);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "localVideoView -> " + localVideoView + "  remoteVideoView -> " + remoteVideoView);
+		return ret;
 	}
 
 	/**
@@ -137,7 +166,10 @@ public class CallService
 	 */
 	public void openLocalPreview(ViewGroup preViewContain)
 	{
-		LogUtil.Log4Android("", TAG + "." + "openLocalPreview", "", "", "", "", "", "", "localVideoView -> " + "preViewContain -> " + preViewContain);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "openLocalPreview", "", "", "",
+		// "", "", "", "localVideoView -> " + "preViewContain -> " +
+		// preViewContain);
 		LogUtil.i(TAG, "openLocalPreview()");
 		LogUtil.i(TAG, "preViewContain -> " + preViewContain);
 		if (!VideoHandler.getIns().isInit())
@@ -145,6 +177,7 @@ public class CallService
 			VideoHandler.getIns().initCallVideo();
 		}
 		CallLogic.getInstance().addLocalRenderToContain(preViewContain);
+		LogUtil.out("", "preViewContain -> " + preViewContain);
 	}
 
 	/**
@@ -159,7 +192,11 @@ public class CallService
 	 */
 	public void openCallVideo(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
 	{
-		LogUtil.Log4Android("", TAG + "." + "openCallVideo", "", "", "", "", "", "", "localViewContain -> " + localViewContain + "  remoteViewContain -> " + remoteViewContain + "  isLocal -> " + isLocal);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "openCallVideo", "", "", "", "",
+		// "", "", "localViewContain -> " + localViewContain +
+		// "  remoteViewContain -> "
+		// + remoteViewContain + "  isLocal -> " + isLocal);
 		LogUtil.i(TAG, "openCallVideo()");
 		LogUtil.i(TAG, "localViewContain -> " + localViewContain);
 		LogUtil.i(TAG, "remoteViewContain -> " + remoteViewContain);
@@ -170,6 +207,7 @@ public class CallService
 			// 只有第一次进入视频通话的时候才去添加view，如果是视频参数更改之类的就不去做此操作
 			VideoHandler.getIns().addRenderToContain(localViewContain, remoteViewContain, isLocal);
 		}
+		LogUtil.out("", "localViewContain -> " + localViewContain + "  remoteViewContain -> " + remoteViewContain + "  isLocal -> " + isLocal);
 	}
 
 	/**
@@ -181,11 +219,15 @@ public class CallService
 	 */
 	public boolean localCameraControl(boolean isCloseAction)
 	{
-		LogUtil.Log4Android("", TAG + "." + "localCameraControl", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "localCameraControl", "", "", "",
+		// "", "", "", "");
 		LogUtil.i(TAG, "localCameraControl()");
 		LogUtil.i(TAG, "isCloseAction -> " + isCloseAction);
 		CallLogic.getInstance().setUserCloseLocalCamera(isCloseAction);
-		return CallLogic.getInstance().localCameraControl(isCloseAction);
+		boolean ret = CallLogic.getInstance().localCameraControl(isCloseAction);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "isCloseAction -> " + isCloseAction);
+		return ret;
 	}
 
 	/**
@@ -193,9 +235,13 @@ public class CallService
 	 */
 	public boolean switchCamera()
 	{
-		LogUtil.Log4Android("", TAG + "." + "switchCamera", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "switchCamera", "", "", "", "",
+		// "", "", "");
 		LogUtil.i(TAG, "switchCamera()");
-		return VideoHandler.getIns().switchCamera();
+		boolean ret = VideoHandler.getIns().switchCamera();
+		LogUtil.out(Boolean.valueOf(ret).toString(), "");
+		return ret;
 	}
 
 	/**
@@ -207,9 +253,13 @@ public class CallService
 	 */
 	public boolean agreeUpgradeVideo()
 	{
-		LogUtil.Log4Android("", TAG + "." + "agreeUpgradeVideo", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "agreeUpgradeVideo", "", "", "",
+		// "", "", "", "");
 		LogUtil.i(TAG, "agreeUpgradeVideo()");
-		return CallLogic.getInstance().agreeUpgradeVideo();
+		boolean ret = CallLogic.getInstance().agreeUpgradeVideo();
+		LogUtil.out(Boolean.valueOf(ret).toString(), "");
+		return ret;
 	}
 
 	/**
@@ -219,9 +269,13 @@ public class CallService
 	 */
 	public boolean rejectUpgradeVideo()
 	{
-		LogUtil.Log4Android("", TAG + "." + "rejectUpgradeVideo", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "rejectUpgradeVideo", "", "", "",
+		// "", "", "", "");
 		LogUtil.i(TAG, "rejectUpgradeVideo()");
-		return CallLogic.getInstance().rejectUpgradeVideo();
+		boolean ret = CallLogic.getInstance().rejectUpgradeVideo();
+		LogUtil.out(Boolean.valueOf(ret).toString(), "");
+		return ret;
 	}
 
 	/**
@@ -233,9 +287,13 @@ public class CallService
 	 */
 	public boolean upgradeVideo()
 	{
-		LogUtil.Log4Android("", TAG + "." + "upgradeVideo", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "upgradeVideo", "", "", "", "",
+		// "", "", "");
 		LogUtil.i(TAG, "upgradeVideo()");
-		return CallLogic.getInstance().upgradeVideo();
+		boolean ret = CallLogic.getInstance().upgradeVideo();
+		LogUtil.out(Boolean.valueOf(ret).toString(), "");
+		return ret;
 	}
 
 	/**
@@ -243,9 +301,13 @@ public class CallService
 	 */
 	public boolean closeVideo()
 	{
-		LogUtil.Log4Android("", TAG + "." + "closeVideo", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "closeVideo", "", "", "", "", "",
+		// "", "");
 		LogUtil.i(TAG, "closeVideo()");
-		return CallLogic.getInstance().closeVideo();
+		boolean ret = CallLogic.getInstance().closeVideo();
+		LogUtil.out(Boolean.valueOf(ret).toString(), "");
+		return ret;
 	}
 
 	/**
@@ -256,10 +318,13 @@ public class CallService
 	 */
 	public boolean sendDTMF(String code)
 	{
-		LogUtil.Log4Android("", TAG + "." + "sendDTMF", "", "", "", "", "", "", "code -> " + code);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "sendDTMF", "", "", "", "", "",
+		// "", "code -> " + code);
 		LogUtil.i(TAG, "sendDTMF()");
 		LogUtil.i(TAG, "code -> " + code);
 		boolean ret = CallLogic.getInstance().reDial(code);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "code -> " + code);
 		return ret;
 	}
 
@@ -273,11 +338,15 @@ public class CallService
 	 */
 	public boolean setLocalMute(boolean isRefer, boolean isMute)
 	{
-		LogUtil.Log4Android("", TAG + "." + "setLocalMute", "", "", "", "", "", "", "isMute -> " + isMute);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "setLocalMute", "", "", "", "",
+		// "", "", "isMute -> " + isMute);
 		LogUtil.i(TAG, "setLocalMute()");
 		LogUtil.i(TAG, "isRefer -> " + isRefer);
 		LogUtil.i(TAG, "isMute -> " + isMute);
-		return CallLogic.getInstance().setLocalMute(isRefer, isMute);
+		boolean ret = CallLogic.getInstance().setLocalMute(isRefer, isMute);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "isMute -> " + isMute);
+		return ret;
 	}
 
 	/**
@@ -285,10 +354,14 @@ public class CallService
 	 */
 	public boolean oratorMute(boolean isMute)
 	{
-		LogUtil.Log4Android("", TAG + "." + "oratorMute", "", "", "", "", "", "", "isMute -> " + isMute);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "oratorMute", "", "", "", "", "",
+		// "", "isMute -> " + isMute);
 		LogUtil.i(TAG, "oratorMute()");
 		LogUtil.i(TAG, "isMute -> " + isMute);
-		return CallLogic.getInstance().oratorMute(isMute);
+		boolean ret = CallLogic.getInstance().oratorMute(isMute);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "isMute -> " + isMute);
+		return ret;
 	}
 
 	/**
@@ -296,9 +369,13 @@ public class CallService
 	 */
 	public boolean changeAudioRoute()
 	{
-		LogUtil.Log4Android("", TAG + "." + "changeAudioRoute", "", "", "", "", "", "", "");
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "changeAudioRoute", "", "", "",
+		// "", "", "", "");
 		LogUtil.i(TAG, "changeAudioRoute()");
-		return CallLogic.getInstance().changeAudioRoute();
+		boolean ret = CallLogic.getInstance().changeAudioRoute();
+		LogUtil.out(Boolean.valueOf(ret).toString(), "");
+		return ret;
 	}
 
 	/**
@@ -311,11 +388,16 @@ public class CallService
 	 */
 	public void setCameraDegree(int cameraRotation, int localRotation)
 	{
-		LogUtil.Log4Android("", TAG + "." + "setCameraDegree", "", "", "", "", "", "", "cameraRotation -> " + cameraRotation + "  localRotation -> " + localRotation);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "setCameraDegree", "", "", "",
+		// "", "", "", "cameraRotation -> " + cameraRotation +
+		// "  localRotation -> "
+		// + localRotation);
 		LogUtil.i(TAG, "setCameraDegree()");
 		LogUtil.i(TAG, "cameraRotation -> " + cameraRotation);
 		LogUtil.i(TAG, "localRotation -> " + localRotation);
 		CallLogic.getInstance().setCameraDegree(cameraRotation, localRotation);
+		LogUtil.out("", "cameraRotation -> " + cameraRotation + "  localRotation -> " + localRotation);
 	}
 
 	/**
@@ -323,10 +405,14 @@ public class CallService
 	 */
 	public boolean setBandwidth(int bw)
 	{
-		LogUtil.Log4Android("", TAG + "." + "setBandwidth", "", "", "", "", "", "", "cameraRotation -> " + "bw -> " + bw);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "setBandwidth", "", "", "", "",
+		// "", "", "cameraRotation -> " + "bw -> " + bw);
 		LogUtil.i(TAG, "setBandwidth()");
 		LogUtil.i(TAG, "bw -> " + bw);
-		return CallLogic.getInstance().setFastBandwidth(bw);
+		boolean ret = CallLogic.getInstance().setFastBandwidth(bw);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "cameraRotation -> " + "bw -> " + bw);
+		return ret;
 	}
 
 	/**
@@ -334,10 +420,14 @@ public class CallService
 	 */
 	public boolean setVideoMode(int videoMode)
 	{
-		LogUtil.Log4Android("", TAG + "." + "setVideoMode", "", "", "", "", "", "", "cameraRotation -> " + "videoMode -> " + videoMode);
+		LogUtil.in();
+		// LogUtil.log4Android("", TAG + "." + "setVideoMode", "", "", "", "",
+		// "", "", "cameraRotation -> " + "videoMode -> " + videoMode);
 		LogUtil.i(TAG, "setVideoMode()");
 		LogUtil.i(TAG, "videoMode -> " + videoMode);
-		return VideoHandler.getIns().setVideoMode(videoMode);
+		boolean ret = VideoHandler.getIns().setVideoMode(videoMode);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "cameraRotation -> " + "videoMode -> " + videoMode);
+		return ret;
 	}
 
 	/**
@@ -345,9 +435,12 @@ public class CallService
 	 */
 	public boolean setEncryptMode(int encryptMode)
 	{
+		LogUtil.in();
 		LogUtil.i(TAG, "setEncryptMode()");
 		LogUtil.i(TAG, "encryptMode -> " + encryptMode);
-		return VideoHandler.getIns().setEncryptMode(encryptMode);
+		boolean ret = VideoHandler.getIns().setEncryptMode(encryptMode);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "encryptMode -> " + encryptMode);
+		return ret;
 	}
 
 	/**
@@ -355,8 +448,10 @@ public class CallService
 	 */
 	public void forceCloseCall()
 	{
+		LogUtil.in();
 		LogUtil.i(TAG, "forceCloseCall()");
 		CallLogic.getInstance().forceCloseCall();
+		LogUtil.out("", "");
 	}
 
 	/**
@@ -364,7 +459,10 @@ public class CallService
 	 */
 	public StreamInfo getMediaInfo()
 	{
-		return CallLogic.getInstance().getMediaInfo();
+		LogUtil.in();
+		StreamInfo ret = CallLogic.getInstance().getMediaInfo();
+		LogUtil.out(ret.toString(), "");
+		return ret;
 	}
 
 	/**
@@ -372,7 +470,10 @@ public class CallService
 	 */
 	public int getVoipStatus()
 	{
-		return CallLogic.getInstance().getVoipStatus();
+		LogUtil.in();
+		int ret = CallLogic.getInstance().getVoipStatus();
+		LogUtil.out("" + ret, "");
+		return ret;
 	}
 
 	/**
@@ -380,17 +481,26 @@ public class CallService
 	 */
 	public String getCurrentCallID()
 	{
-		return CallLogic.getInstance().getCurrentCallID();
+		LogUtil.in();
+		String ret = CallLogic.getInstance().getCurrentCallID();
+		LogUtil.out(ret, "");
+		return ret;
 	}
 
 	public String getBfcpStatus()
 	{
-		return CallLogic.getInstance().getBfcpStatus();
+		LogUtil.in();
+		String ret = CallLogic.getInstance().getBfcpStatus();
+		LogUtil.out(ret, "");
+		return ret;
 	}
 
 	public String getCallNumber()
 	{
-		return CallLogic.getInstance().getCallNumber();
+		LogUtil.in();
+		String ret = CallLogic.getInstance().getCallNumber();
+		LogUtil.out(ret, "");
+		return ret;
 	}
 
 	/**
