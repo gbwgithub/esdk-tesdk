@@ -29,8 +29,10 @@ import android.os.Message;
 import android.util.Log;
 
 import com.huawei.application.BaseApp;
+import com.huawei.common.CustomBroadcastConst;
 import com.huawei.common.LogSDK;
 import com.huawei.common.Resource;
+import com.huawei.common.ResponseCodeHandler.ResponseCode;
 import com.huawei.ecs.mtk.log.AndroidLogger;
 import com.huawei.ecs.mtk.log.LogLevel;
 import com.huawei.ecs.mtk.log.Logger;
@@ -98,16 +100,17 @@ public class TESDK
 		String fileContents = new String(Log4Android.InputStreamToByte(is));
 
 		LogUtil.d(TAG, "Log4Android fileContents -> " + fileContents);
-		//日志初始化
-		int[] logLevel = {0, 0, 3};
+		// 日志初始化
+		int[] logLevel = { 0, 0, 3 };
 		Log.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, logLevel, "/sdcard/TEMobile/log"));
 		Log4Android.getInstance().setCallBackMethod();
 		Log4Android.getInstance().setSendLogStrategy(0, 2, "172.22.9.38:9086");
 		Log4Android.getInstance().initMobileLog(LogUtil.product);
 
-//		LogUtil.log4Android("", TAG + "." + "initSDK", "", "", "", "", "", "", app.toString());
+		// LogUtil.log4Android("", TAG + "." + "initSDK", "", "", "", "", "",
+		// "", app.toString());
 		LogUtil.out("", "app -> " + app.toString());
-		
+
 		// Log.d(TAG, "new Throwable().getStackTrace().length -> " + new
 		// Throwable().getStackTrace().length);
 		// new Throwable().printStackTrace();
@@ -210,7 +213,6 @@ public class TESDK
 		// Log4Android.getInstance().logInterfaceError(product, "2", "HTTP+XML",
 		// "TESTERROR", "", "", "", "2015-12-10", "2015-12-10", "aa", "bb");
 
-
 		// // 成功
 		// Log4Android.getInstance().logInterfaceInfo(product, "2", "HTTP+XML",
 		// "Authentic.login", "", "", "", reqTime, RespTime, "" + loginFlag,
@@ -250,6 +252,10 @@ public class TESDK
 
 		Log.d(TAG, "isPhone -> " + isPhone);
 		LayoutUtil.setIsPhone(isPhone);
+
+		// 注册登录广播
+		registeBroadcast(app);
+
 		// LayoutUtil.setCustomizeVersions(application.getResources().getString(R.string.customize_versions));
 		// LayoutUtil.setLoadPortLayout(getResources().getBoolean(R.bool.mobile_screen));
 
@@ -276,9 +282,11 @@ public class TESDK
 
 	/**
 	 * 设置记录Log文件开关及路径
-	 *
-	 * @param debugSwitch 是否记录Log文件
-	 * @param path        Log文件路径
+	 * 
+	 * @param debugSwitch
+	 *            是否记录Log文件
+	 * @param path
+	 *            Log文件路径
 	 */
 	public void setLogPath(boolean debugSwitch, String path)
 	{
@@ -302,7 +310,7 @@ public class TESDK
 
 	/**
 	 * Function: 写日志总开关
-	 *
+	 * 
 	 * @return boolean true/ false
 	 */
 	private boolean logSwitch()
@@ -330,9 +338,11 @@ public class TESDK
 
 	/**
 	 * Logcat日志写入文件开关
-	 *
-	 * @param debugSwitch 是否写MAA日志
-	 * @param logPath     日志路径 （打开，和关闭的路径应该一致）
+	 * 
+	 * @param debugSwitch
+	 *            是否写MAA日志
+	 * @param logPath
+	 *            日志路径 （打开，和关闭的路径应该一致）
 	 */
 	private void saveLogcat(boolean debugSwitch, String logPath)
 	{
@@ -375,10 +385,13 @@ public class TESDK
 
 	/**
 	 * 方法名称：callWhenServiceConnected 方法描述：绑定服务后回调
-	 *
-	 * @param target      输入参数
-	 * @param callback    输入参数
-	 * @param isAutoLogin 输入参数 返回类型：void
+	 * 
+	 * @param target
+	 *            输入参数
+	 * @param callback
+	 *            输入参数
+	 * @param isAutoLogin
+	 *            输入参数 返回类型：void
 	 */
 	private void callWhenServiceConnected(Handler target, Runnable callback, boolean isAutoLogin)
 	{
@@ -409,7 +422,7 @@ public class TESDK
 
 	/**
 	 * Function: 判断当前的Service 是否已经绑定上
-	 *
+	 * 
 	 * @return boolean
 	 */
 	private boolean serviceConnected()
@@ -465,10 +478,11 @@ public class TESDK
 	/**
 	 * 停止 SDK Service
 	 */
-	public void stopSDKService()
+	private void stopSDKService()
 	{
 		LogUtil.in();
-//		LogUtil.log4Android("", TAG + "." + "stopSDKService", "", "", "", "", "", "", "");
+		// LogUtil.log4Android("", TAG + "." + "stopSDKService", "", "", "", "",
+		// "", "", "");
 		synchronized (SERVICE_LOCK)
 		{
 			LogUtil.i(TAG, "stopImServiceIfInactive enter.");
@@ -499,7 +513,8 @@ public class TESDK
 	public boolean login(final LoginParameter loginParameter)
 	{
 		LogUtil.in();
-//		LogUtil.log4Android("", TAG + "." + "login", "", "", "", "", "", "", loginParameter.toString());
+		// LogUtil.log4Android("", TAG + "." + "login", "", "", "", "", "", "",
+		// loginParameter.toString());
 		LogUtil.i(TAG, "login()");
 		LogUtil.i(TAG, "loginParameter -> CallBandWidth:" + loginParameter.getCallBandWidth());
 		LogUtil.i(TAG, "loginParameter -> CT :" + loginParameter.getCT());
@@ -651,7 +666,8 @@ public class TESDK
 	public void logout()
 	{
 		LogUtil.in();
-//		LogUtil.log4Android("", TAG + "." + "logout", "", "", "", "", "", "", "");
+		// LogUtil.log4Android("", TAG + "." + "logout", "", "", "", "", "", "",
+		// "");
 		if (getmService() != null)
 		{
 			new Handler().postDelayed(logoutWaitRunnable, 2000);
@@ -683,7 +699,73 @@ public class TESDK
 		}
 	};
 
-	public void registerScreenActionReceiver(Context mContext)
+	private BroadcastReceiver mReceiver = new BroadcastReceiver()
+	{
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			if (intent != null)
+			{
+				Log.i(TAG, "onReceive broadcast ->" + intent);
+
+				handlerBroadcastEvent(intent);
+			}
+		}
+	};
+
+	/**
+	 * 异步处理 广播事件
+	 */
+	private void handlerBroadcastEvent(final Intent intent)
+	{
+		if (intent != null)
+		{
+			Log.d(TAG, "handlerBroadcastEvent ->" + intent.getAction());
+			String action = intent.getAction();
+
+			if (CustomBroadcastConst.ACTION_CONNECT_TO_SERVER.equals(action))
+			{
+				Log.d(TAG, "connect to server");
+				onConnectToServer(intent);
+			}
+		}
+	}
+
+	/**
+	 * 注册登录广播
+	 */
+	private void registeBroadcast(Application app)
+	{
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(CustomBroadcastConst.ACTION_CONNECT_TO_SERVER);
+		// filter.addAction(CustomBroadcastConst.ACTION_LOGIN_RESPONSE);
+		// filter.addAction(Constants.BROADCAST_PATH.ACTION_HOMEACTIVITY_SHOW);
+		// filter.addAction(CustomBroadcastConst.ACTION_SVN_AUTHENTICATION_RESPONSE);
+		// filter.addAction(HeartBeatConfig.ACTION_RECONNECT);
+		app.registerReceiver(mReceiver, filter);
+	}
+
+	/**
+	 * 连接成功回调
+	 */
+	private void onConnectToServer(final Intent intent)
+	{
+		boolean flag = intent.getBooleanExtra(Resource.SERVICE_RESPONSE_DATA, false);
+		if (flag)
+		{
+			if (getmService() != null)
+			{
+			} else
+			{
+				stopSDKService();
+			}
+		} else
+		{
+			stopSDKService();
+		}
+	}
+
+	private void registerScreenActionReceiver(Context mContext)
 	{
 		if (!isRegisterScreenReceiver)
 		{
@@ -697,7 +779,7 @@ public class TESDK
 		}
 	}
 
-	public void unRegisterScreenActionReceiver(Context mContext)
+	private void unRegisterScreenActionReceiver(Context mContext)
 	{
 		if (isRegisterScreenReceiver)
 		{

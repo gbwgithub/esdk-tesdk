@@ -15,6 +15,12 @@
 
 package com.huawei.esdk.te.util;
 
+import android.annotation.SuppressLint;
+import android.util.Log;
+
+import com.huawei.esdk.log4Android.Log4Android;
+import com.huawei.esdk.te.TESDK;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -23,21 +29,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import android.annotation.SuppressLint;
-import android.util.Log;
-
-import com.huawei.esdk.log4Android.Log4Android;
-import com.huawei.esdk.te.TESDK;
-
 /**
  * 带日志文件输入的，又可控开关的日志调试
  */
-@SuppressLint("NewApi") public class LogUtil
+@SuppressLint("NewApi")
+public class LogUtil
 {
 	private static final String TAG = LogUtil.class.getSimpleName();
-	
-	private static String inInterface = "";	//用于记录in()函数进入的接口名
-	private static String inTime = "";	//用于记录in()函数进入的时间
+
+	private static String inInterface = "";    //用于记录in()函数进入的接口名
+	private static String inTime = "";    //用于记录in()函数进入的时间
 
 	public final static String product = "TE-API-Android";
 	private final static String format = "yyyy-MM-dd HH:mm:ss SSS";
@@ -76,16 +77,19 @@ import com.huawei.esdk.te.TESDK;
 		return MYLOG_SWITCH;
 	}
 
-	public static void in(){
+	public static void in()
+	{
 		inInterface = new Throwable().getStackTrace()[1].getMethodName();
 		inTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
 		Log.d(TAG, "in function -> " + new Throwable().getStackTrace()[1].getMethodName());
 		log(TAG, "in function -> " + new Throwable().getStackTrace()[1].getMethodName(), 'v');
 	}
-	
-	public static void out(String resultCode, String params){
+
+	public static void out(String resultCode, String params)
+	{
 		String outInterface = new Throwable().getStackTrace()[1].getMethodName();
-		if(inInterface.equals(outInterface) && !outInterface.equals(TAG)){
+		if (inInterface.equals(outInterface) && !outInterface.equals(TAG))
+		{
 			String respTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
 			log4Android("", outInterface, "", "", "", inTime, respTime, resultCode, params);
 			return;
@@ -93,20 +97,20 @@ import com.huawei.esdk.te.TESDK;
 		log(TAG, "out function -> " + new Throwable().getStackTrace()[1].getMethodName(), 'v');
 		Log.e(TAG, "outInterface dosn't mathc inInterface");
 	}
-	
+
 	public static void log4Android(String protocolType, String interfaceName, String sourceAddr, String targetAddr, String transactionID, String reqTime,
-			String respTime, String resultCode, String params)
+	                               String respTime, String resultCode, String params)
 	{
 		if (null != protocolType && "".equals(protocolType))
 		{
 			protocolType = "Native";
 		}
-		
+
 		if (null != reqTime && "".equals(reqTime))
 		{
 			reqTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
 		}
-		
+
 		Log4Android.getInstance().logInterfaceInfo(product, "1", protocolType, interfaceName, sourceAddr, targetAddr, transactionID, reqTime, respTime,
 				resultCode, params);
 	}
@@ -194,7 +198,7 @@ import com.huawei.esdk.te.TESDK;
 
 	/**
 	 * 打开日志文件并写入日志
-	 * **/
+	 **/
 	private static void writeLogtoFile(String mylogtype, String tag, String text)
 	{
 		// 新建或打开日志文件
@@ -221,7 +225,7 @@ import com.huawei.esdk.te.TESDK;
 
 	/**
 	 * 删除制定的日志文件
-	 * */
+	 */
 	public static void delFile()
 	{// 删除日志文件
 		String needDelFiel = logfile.format(getDateBefore());
@@ -234,7 +238,7 @@ import com.huawei.esdk.te.TESDK;
 
 	/**
 	 * 得到现在时间前的几天日期，用来得到需要删除的日志文件名
-	 * */
+	 */
 	private static Date getDateBefore()
 	{
 		Date nowtime = new Date();
