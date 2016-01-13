@@ -102,7 +102,7 @@ public class TESDK
 		LogUtil.d(TAG, "Log4Android fileContents -> " + fileContents);
 		// 日志初始化
 		int[] logLevel = { 0, 0, 3 };
-		Log.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, logLevel, "/sdcard/TEMobile/log"));
+		LogUtil.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, logLevel, "/sdcard/TEMobile/log"));
 		Log4Android.getInstance().setCallBackMethod();
 		Log4Android.getInstance().setSendLogStrategy(0, 2, "172.22.9.38:9086");
 		Log4Android.getInstance().initMobileLog(LogUtil.product);
@@ -111,97 +111,97 @@ public class TESDK
 		// "", app.toString());
 		LogUtil.out("", "app -> " + app.toString());
 
-		// Log.d(TAG, "new Throwable().getStackTrace().length -> " + new
+		// LogUtil.d(TAG, "new Throwable().getStackTrace().length -> " + new
 		// Throwable().getStackTrace().length);
 		// new Throwable().printStackTrace();
 		//
 		// String clazzName0 = new
 		// Throwable().getStackTrace()[0].getClassName();
-		// Log.d(TAG, "new Throwable().getStackTrace()[0].getClassName() -> " +
+		// LogUtil.d(TAG, "new Throwable().getStackTrace()[0].getClassName() -> " +
 		// clazzName0);
 		//
 		// String funcName0 = new
 		// Throwable().getStackTrace()[0].getMethodName();
-		// Log.d(TAG, "new Throwable().getStackTrace()[0].getMethodName() -> " +
+		// LogUtil.d(TAG, "new Throwable().getStackTrace()[0].getMethodName() -> " +
 		// funcName0);
 		//
 		// String clazzName1 = new
 		// Throwable().getStackTrace()[1].getClassName();
-		// Log.d(TAG, "new Throwable().getStackTrace()[1].getClassName() -> " +
+		// LogUtil.d(TAG, "new Throwable().getStackTrace()[1].getClassName() -> " +
 		// clazzName1);
 		//
 		// String funcName1 = new
 		// Throwable().getStackTrace()[1].getMethodName();
-		// Log.d(TAG, "new Throwable().getStackTrace()[1].getMethodName() -> " +
+		// LogUtil.d(TAG, "new Throwable().getStackTrace()[1].getMethodName() -> " +
 		// funcName1);
 		//
 		// String clazzName2 = new
 		// Throwable().getStackTrace()[2].getClassName();
-		// Log.d(TAG, "new Throwable().getStackTrace()[2].getClassName() -> " +
+		// LogUtil.d(TAG, "new Throwable().getStackTrace()[2].getClassName() -> " +
 		// clazzName2);
 		//
 		// String funcName2 = new
 		// Throwable().getStackTrace()[2].getMethodName();
-		// Log.d(TAG, "new Throwable().getStackTrace()[2].getMethodName() -> " +
+		// LogUtil.d(TAG, "new Throwable().getStackTrace()[2].getMethodName() -> " +
 		// funcName2);
 		//
 		// String clazzName00 =
 		// Thread.currentThread().getStackTrace()[0].getClassName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[0].getMethodName() -> " +
 		// clazzName00);
 		//
 		// String funcName00 =
 		// Thread.currentThread().getStackTrace()[0].getMethodName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[0].getMethodName() -> " +
 		// funcName00);
 		//
 		// String clazzName01 =
 		// Thread.currentThread().getStackTrace()[1].getClassName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[1].getMethodName() -> " +
 		// clazzName01);
 		//
 		// String funcName01 =
 		// Thread.currentThread().getStackTrace()[1].getMethodName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[1].getMethodName() -> " +
 		// funcName01);
 		//
 		// String clazzName02 =
 		// Thread.currentThread().getStackTrace()[2].getClassName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[2].getMethodName() -> " +
 		// clazzName02);
 		//
 		// String funcName02 =
 		// Thread.currentThread().getStackTrace()[2].getMethodName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[2].getMethodName() -> " +
 		// funcName02);
 		//
 		// String clazzName03 =
 		// Thread.currentThread().getStackTrace()[3].getClassName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[3].getMethodName() -> " +
 		// clazzName03);
 		//
 		// String funcName03 =
 		// Thread.currentThread().getStackTrace()[3].getMethodName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[3].getMethodName() -> " +
 		// funcName03);
 		//
 		// String clazzName04 =
 		// Thread.currentThread().getStackTrace()[4].getClassName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[4].getMethodName() -> " +
 		// clazzName04);
 		//
 		// String funcName04 =
 		// Thread.currentThread().getStackTrace()[4].getMethodName();
-		// Log.d(TAG,
+		// LogUtil.d(TAG,
 		// "Thread.currentThread().getStackTrace()[4].getMethodName() -> " +
 		// funcName04);
 
@@ -230,11 +230,11 @@ public class TESDK
 
 	private TESDK(Application app)
 	{
-		Log.d(TAG, "TESDK construct");
+		LogUtil.d(TAG, "TESDK construct");
 		application = app;
 		debugSwitch = false;
 		logPath = application.getFilesDir().getPath() + SDK_LOG_DIR;
-		Log.d(TAG, "init logPath -> " + logPath);
+		LogUtil.d(TAG, "init logPath -> " + logPath);
 
 		boolean isPhone = false;
 		OrieantationUtil.getIns().setDeviceReferenceAngle();
@@ -250,7 +250,7 @@ public class TESDK
 			isPhone = true;
 		}
 
-		Log.d(TAG, "isPhone -> " + isPhone);
+		LogUtil.d(TAG, "isPhone -> " + isPhone);
 		LayoutUtil.setIsPhone(isPhone);
 
 		// 注册登录广播
@@ -326,14 +326,14 @@ public class TESDK
 	 */
 	private void setFastLog(boolean logSwitch)
 	{
-		Log.d(TAG, "setFastLog");
+		LogUtil.d(TAG, "setFastLog");
 		if (mService != null)
 		{
-			Log.d(TAG, "setFastLog:" + logPath);
+			LogUtil.d(TAG, "setFastLog:" + logPath);
 			mService.setLogSwitch(logPath, logSwitch);
 			return;
 		}
-		Log.e(TAG, "setFastLog Failed -> service is null.");
+		Log.w(TAG, "setFastLog Failed -> service is null.");
 	}
 
 	/**
@@ -706,7 +706,7 @@ public class TESDK
 		{
 			if (intent != null)
 			{
-				Log.i(TAG, "onReceive broadcast ->" + intent);
+				LogUtil.i(TAG, "onReceive broadcast ->" + intent);
 
 				handlerBroadcastEvent(intent);
 			}
@@ -720,12 +720,12 @@ public class TESDK
 	{
 		if (intent != null)
 		{
-			Log.d(TAG, "handlerBroadcastEvent ->" + intent.getAction());
+			LogUtil.d(TAG, "handlerBroadcastEvent ->" + intent.getAction());
 			String action = intent.getAction();
 
 			if (CustomBroadcastConst.ACTION_CONNECT_TO_SERVER.equals(action))
 			{
-				Log.d(TAG, "connect to server");
+				LogUtil.d(TAG, "connect to server");
 				onConnectToServer(intent);
 			}
 		}

@@ -37,8 +37,8 @@ public class LogUtil
 {
 	private static final String TAG = LogUtil.class.getSimpleName();
 
-	private static String inInterface = "";    //用于记录in()函数进入的接口名
-	private static String inTime = "";    //用于记录in()函数进入的时间
+	private static String inInterface = ""; // 用于记录in()函数进入的接口名
+	private static String inTime = ""; // 用于记录in()函数进入的时间
 
 	public final static String product = "TE-API-Android";
 	private final static String format = "yyyy-MM-dd HH:mm:ss SSS";
@@ -81,7 +81,8 @@ public class LogUtil
 	{
 		inInterface = new Throwable().getStackTrace()[1].getMethodName();
 		inTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
-		Log.d(TAG, "in function -> " + new Throwable().getStackTrace()[1].getMethodName());
+		// Log.d(TAG, "in function -> " + new
+		// Throwable().getStackTrace()[1].getMethodName());
 		log(TAG, "in function -> " + new Throwable().getStackTrace()[1].getMethodName(), 'v');
 	}
 
@@ -95,11 +96,11 @@ public class LogUtil
 			return;
 		}
 		log(TAG, "out function -> " + new Throwable().getStackTrace()[1].getMethodName(), 'v');
-		Log.e(TAG, "outInterface dosn't mathc inInterface");
+		LogUtil.e(TAG, "outInterface dosn't mathc inInterface");
 	}
 
 	public static void log4Android(String protocolType, String interfaceName, String sourceAddr, String targetAddr, String transactionID, String reqTime,
-	                               String respTime, String resultCode, String params)
+			String respTime, String resultCode, String params)
 	{
 		if (null != protocolType && "".equals(protocolType))
 		{
