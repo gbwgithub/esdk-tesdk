@@ -92,8 +92,6 @@ public class CallService
 	 *            接听会话的唯一标识callId
 	 * @param isVideo
 	 *            是否需要接入视频， 普通通话传入false
-	 * @param context
-	 *            上下文
 	 * @return true表示成功，false表示失败
 	 */
 	public boolean callAnswer(String callId, boolean isVideo)
@@ -183,9 +181,9 @@ public class CallService
 	/**
 	 * 把视频画面填加到界面布局中
 	 * 
-	 * @param localView
+	 * @param localViewContain
 	 *            包含本地render
-	 * @param remoteView
+	 * @param remoteViewContain
 	 *            包含远端render
 	 * @param isLocal
 	 *            true 本地最上面 false远端最上面
@@ -247,8 +245,6 @@ public class CallService
 	/**
 	 * 接受视频升级
 	 * 
-	 * @param caps
-	 *            视频参数
 	 * @return 执行结果 true 为执行成功 false 执行失败
 	 */
 	public boolean agreeUpgradeVideo()
@@ -281,8 +277,6 @@ public class CallService
 	/**
 	 * 音频通话转视频通话
 	 * 
-	 * @param caps
-	 *            视频参数
 	 * @return 执行结果 true 执行成功 false 执行失败
 	 */
 	public boolean upgradeVideo()
@@ -476,7 +470,7 @@ public class CallService
 		LogUtil.out("" + ret, "");
 		return ret;
 	}
-
+	//TO test commit on Android Studio .
 	/**
 	 * 获取当前CallID
 	 */
