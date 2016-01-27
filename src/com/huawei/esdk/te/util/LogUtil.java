@@ -40,7 +40,7 @@ public class LogUtil
 	private static String inInterface = ""; // 用于记录in()函数进入的接口名
 	private static String inTime = ""; // 用于记录in()函数进入的时间
 
-	public final static String product = "TE-API-Android";
+	public final static String product = "eSDK-TE-API-Android";
 	private final static String format = "yyyy-MM-dd HH:mm:ss SSS";
 
 	// 日志文件总开关
@@ -80,7 +80,7 @@ public class LogUtil
 	public static void in()
 	{
 		inInterface = new Throwable().getStackTrace()[1].getMethodName();
-		inTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
+		inTime = new SimpleDateFormat(format).format(new Date());
 		// Log.d(TAG, "in function -> " + new
 		// Throwable().getStackTrace()[1].getMethodName());
 		log(TAG, "in function -> " + new Throwable().getStackTrace()[1].getMethodName(), 'v');
@@ -91,7 +91,7 @@ public class LogUtil
 		String outInterface = new Throwable().getStackTrace()[1].getMethodName();
 		if (inInterface.equals(outInterface) && !outInterface.equals(TAG))
 		{
-			String respTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
+			String respTime = new SimpleDateFormat(format).format(new Date());
 			log4Android("", outInterface, "", "", "", inTime, respTime, resultCode, params);
 			return;
 		}
@@ -109,7 +109,7 @@ public class LogUtil
 
 		if (null != reqTime && "".equals(reqTime))
 		{
-			reqTime = String.format("[%s]", new SimpleDateFormat(format).format(new Date()));
+			reqTime = new SimpleDateFormat(format).format(new Date());
 		}
 
 		Log4Android.getInstance().logInterfaceInfo(product, "1", protocolType, interfaceName, sourceAddr, targetAddr, transactionID, reqTime, respTime,

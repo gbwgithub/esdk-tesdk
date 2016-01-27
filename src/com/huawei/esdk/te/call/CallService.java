@@ -461,6 +461,7 @@ public class CallService
 	{
 		LogUtil.in();
 		StreamInfo ret = CallLogic.getInstance().getMediaInfo();
+		if(null != ret)
 		LogUtil.out(ret.toString(), "");
 		return ret;
 	}
