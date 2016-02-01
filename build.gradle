@@ -12,7 +12,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 apply plugin: 'android-library'
 
 dependencies {
@@ -23,6 +22,16 @@ android {
     compileSdkVersion 19
     buildToolsVersion '22.0.1'
 
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+    
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -49,31 +58,13 @@ android {
     }
 }
 
-task buildJar(dependsOn: ['compileReleaseJava'], type: Jar) {
-
-    appendix = "demo"
-    baseName = "androidJar"
-    version = "1.0.0"
-    classifier = "release"
-
-    //后缀名
-    extension = "jar"
-    //最终的 Jar 包名，如果没设置，默认为 [baseName]-[appendix]-[version]-[classifier].[extension]
-    archiveName = "AndroidJarDemo.jar"
-
-    //需打包的资源所在的路径集
-    def srcClassDir = [project.buildDir.absolutePath + "/intermediates/classes/release"];
-    //初始化资源路径集
-    from srcClassDir
-
-    //去除路径集下部分的资源
-    exclude "org/chaos/demo/jar/BuildConfig.class"
-    exclude "org/chaos/demo/jar/BuildConfig\$*.class"
-    exclude "**/R.class"
-    exclude "**/R\$*.class"
-
-    //只导入资源路径集下的部分资源
-    include "org/chaos/demo/jar/**/*.class"
-
-    //注: exclude include 支持可变长参数
+android.libraryVariants.all{ variant->
+    def name = variant.buildType.name
+    if(name.equals(com.android.builder.core.BuilderConstants.DEBUG)){
+        return
+    }
+    def task = project.tasks.create "jar${name.capitalize()}",Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    artifacts.add('archives',task)
 }
