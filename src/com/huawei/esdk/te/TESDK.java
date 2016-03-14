@@ -32,7 +32,6 @@ import com.huawei.application.BaseApp;
 import com.huawei.common.CustomBroadcastConst;
 import com.huawei.common.LogSDK;
 import com.huawei.common.Resource;
-import com.huawei.common.ResponseCodeHandler.ResponseCode;
 import com.huawei.ecs.mtk.log.AndroidLogger;
 import com.huawei.ecs.mtk.log.LogLevel;
 import com.huawei.ecs.mtk.log.Logger;
@@ -666,8 +665,6 @@ public class TESDK
 	public void logout()
 	{
 		LogUtil.in();
-		// LogUtil.log4Android("", TAG + "." + "logout", "", "", "", "", "", "",
-		// "");
 		if (getmService() != null)
 		{
 			new Handler().postDelayed(logoutWaitRunnable, 2000);

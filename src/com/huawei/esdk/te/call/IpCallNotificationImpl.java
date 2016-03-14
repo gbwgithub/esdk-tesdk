@@ -15,18 +15,18 @@
 
 package com.huawei.esdk.te.call;
 
-import java.util.Iterator;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import tupsdk.TupCall;
-
 import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.voip.IpCallNotification;
 import com.huawei.voip.data.CameraViewRefresh;
 import com.huawei.voip.data.EventData;
 import com.huawei.voip.data.SessionBean;
+
+import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import common.AuthType;
 import common.DeviceStatus;
+import tupsdk.TupCall;
 
 public class IpCallNotificationImpl implements IpCallNotification
 {

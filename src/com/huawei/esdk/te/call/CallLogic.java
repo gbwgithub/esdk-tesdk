@@ -15,22 +15,11 @@
 
 package com.huawei.esdk.te.call;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import object.StreamInfo;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
-import com.huawei.application.BaseApp;
 import com.huawei.common.CallErrorCode;
 import com.huawei.esdk.te.call.CallConstants.BFCPStatus;
 import com.huawei.esdk.te.call.CallConstants.CallStatus;
@@ -58,6 +47,16 @@ import com.huawei.voip.data.VOIPConfigParamsData;
 import com.huawei.voip.data.VideoCaps;
 import com.huawei.voip.data.VideoCaps.BAND_WIDTH;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import object.StreamInfo;
+
 public class CallLogic
 {
 
@@ -68,10 +67,14 @@ public class CallLogic
 	 */
 	private static final Object RENDER_CHANGE_LOCK = new Object();
 
-	/** 语音通话添加视频（被叫4112） **/
+	/**
+	 * 语音通话添加视频（被叫4112）
+	 **/
 	private static final String VIDEOADD = "add";
 
-	/** 语音通话添加视频（主叫4113） **/
+	/**
+	 * 语音通话添加视频（主叫4113）
+	 **/
 	private static final String VIDEOMOD = "mod";
 
 	private static CallLogic instance;
@@ -174,9 +177,8 @@ public class CallLogic
 
 	/**
 	 * 设置是否是一个视频呼叫
-	 * 
-	 * @param isVideocall
-	 *            是否是一个视频呼叫
+	 *
+	 * @param isVideocall 是否是一个视频呼叫
 	 */
 	public void setVideoCall(boolean isVideocall)
 	{
@@ -196,7 +198,7 @@ public class CallLogic
 
 	/**
 	 * 获取是否为一个视频呼叫
-	 * 
+	 *
 	 * @return the isVideoCall
 	 */
 	public boolean isVideoCall()
@@ -359,9 +361,8 @@ public class CallLogic
 
 	/**
 	 * 初始化参数
-	 * 
-	 * @param service
-	 *            服务代理
+	 *
+	 * @param service 服务代理
 	 */
 	public CallLogic(ServiceProxy service)
 	{
@@ -389,13 +390,10 @@ public class CallLogic
 
 	/**
 	 * 发起呼叫
-	 * 
-	 * @param fromPhone
-	 *            呼叫号码
-	 * @param domain
-	 *            域，暂时无用，可传空
-	 * @param isVideoCall
-	 *            是否视频通话
+	 *
+	 * @param fromPhone   呼叫号码
+	 * @param domain      域，暂时无用，可传空
+	 * @param isVideoCall 是否视频通话
 	 * @return CallErrorCode 成功："0" 失败：CallErrorCode.isFail(callCodeString)为true
 	 */
 	public synchronized String dialCall(String fromPhone, String domain, final boolean isVideoCall)
@@ -434,22 +432,16 @@ public class CallLogic
 
 	/**
 	 * 发起呼叫
-	 * 
-	 * @param fromPhone
-	 *            呼叫号码
-	 * @param domain
-	 *            域，暂时无用，可传空
-	 * @param isVideoCall
-	 *            是否视频通话
-	 * @param vcaps
-	 *            视频通话时，需设置的视频参数，
-	 * @param dataCaps
-	 *            bfcp参数
+	 *
+	 * @param fromPhone   呼叫号码
+	 * @param domain      域，暂时无用，可传空
+	 * @param isVideoCall 是否视频通话
+	 * @param vcaps       视频通话时，需设置的视频参数，
+	 * @param dataCaps    bfcp参数
 	 * @return CallErrorCode 成功："0" 失败：CallErrorCode.isFail(callCodeString)为true
 	 */
 	private synchronized String dialCall(String fromPhone, String domain, boolean isVideoCall, final VideoCaps vcaps, VideoCaps dataCaps)
 	{
-
 		if (CallStatus.STATUS_CLOSE != getVoipStatus())
 		{
 			LogUtil.e(TAG, "dialCall() failed --- getVoipStatus not in close status");
@@ -528,7 +520,7 @@ public class CallLogic
 
 	/**
 	 * 挂断呼叫
-	 * 
+	 *
 	 * @return currentCallId是否为空 - 执行是否成功
 	 */
 	public synchronized boolean closeCall()
@@ -576,13 +568,10 @@ public class CallLogic
 
 	/**
 	 * 接听呼叫，接听一个呼叫，包括音，视频呼叫，返回接听是否成功
-	 * 
-	 * @param callid
-	 *            接听会话的唯一标识callid
-	 * @param isVideo
-	 *            是否需要接入视频， 普通通话传入false
-	 * @param context
-	 *            上下文
+	 *
+	 * @param callid  接听会话的唯一标识callid
+	 * @param isVideo 是否需要接入视频， 普通通话传入false
+	 * @param context 上下文
 	 * @return true表示成功，false表示失败
 	 */
 	public boolean callAnswer(String callid, boolean isVideo)
@@ -602,13 +591,10 @@ public class CallLogic
 
 	/**
 	 * 接听呼叫，接听一个呼叫，包括音，视频呼叫，返回接听是否成功
-	 * 
-	 * @param callid
-	 *            接听会话的唯一标识callid
-	 * @param isNeedAnswerVideo
-	 *            是否需要接入视频， 普通通话传入false
-	 * @param caps
-	 *            如果是视频呼叫需要传入视频render参数，如果是普通回呼，此值可以为null
+	 *
+	 * @param callid            接听会话的唯一标识callid
+	 * @param isNeedAnswerVideo 是否需要接入视频， 普通通话传入false
+	 * @param caps              如果是视频呼叫需要传入视频render参数，如果是普通回呼，此值可以为null
 	 * @return true表示成功，false表示失败
 	 */
 	private boolean callAnswer(String callid, boolean isNeedAnswerVideo, VideoCaps caps, VideoCaps dataCaps)
@@ -667,9 +653,8 @@ public class CallLogic
 
 	/**
 	 * 挂断来电呼叫
-	 * 
-	 * @param callid
-	 *            来电的callid
+	 *
+	 * @param callid 来电的callid
 	 * @return 执行拒绝呼叫结果， true 为成功
 	 */
 	public boolean rejectCall(String callid)
@@ -721,9 +706,8 @@ public class CallLogic
 
 	/**
 	 * 视频应答
-	 * 
-	 * @param caps
-	 *            视频参数
+	 *
+	 * @param caps 视频参数
 	 * @return 执行结果 true 为执行成功 false 执行失败
 	 */
 	public boolean agreeUpgradeVideo()
@@ -760,7 +744,7 @@ public class CallLogic
 
 	/**
 	 * 拒绝视频升级
-	 * 
+	 *
 	 * @return true / false 执行结果 true 执行成功 false 执行失败
 	 */
 	public boolean rejectUpgradeVideo()
@@ -788,9 +772,8 @@ public class CallLogic
 
 	/**
 	 * 通话过程中升级到视频通话
-	 * 
-	 * @param caps
-	 *            视频参数
+	 *
+	 * @param caps 视频参数
 	 * @return 执行结果 true 执行成功 false 执行失败
 	 */
 	public boolean upgradeVideo()
@@ -850,9 +833,8 @@ public class CallLogic
 
 	/**
 	 * 二次拨号
-	 * 
-	 * @param code
-	 *            号码
+	 *
+	 * @param code 号码
 	 * @return 组件调用返回码
 	 */
 	public boolean reDial(String code)
@@ -877,11 +859,9 @@ public class CallLogic
 
 	/**
 	 * 本地麦克风静音
-	 * 
-	 * @param isRefer
-	 *            是否会议中转移 true: 会议中转移， false：非会议中转移，对设备原来的静音状态取反。
-	 * @param isMute
-	 *            是否静音 true: 静音， false：取消静音
+	 *
+	 * @param isRefer 是否会议中转移 true: 会议中转移， false：非会议中转移，对设备原来的静音状态取反。
+	 * @param isMute  是否静音 true: 静音， false：取消静音
 	 */
 	public boolean setLocalMute(boolean isRefer, boolean isMute)
 	{
@@ -920,9 +900,8 @@ public class CallLogic
 
 	/**
 	 * 旋转摄像头
-	 * 
-	 * @param rotation
-	 *            0-0度 1-90度 2-180度 3-270度
+	 *
+	 * @param rotation 0-0度 1-90度 2-180度 3-270度
 	 */
 	public void setRotationCamera(int orientation)
 	{
@@ -936,11 +915,9 @@ public class CallLogic
 
 	/**
 	 * 摄像头旋转角度设置
-	 * 
-	 * @param cameraRotation
-	 *            设置摄像头采集角度（视频捕获角度）
-	 * @param localRotation
-	 *            设置本地图像显示角度
+	 *
+	 * @param cameraRotation 设置摄像头采集角度（视频捕获角度）
+	 * @param localRotation  设置本地图像显示角度
 	 */
 	public void setCameraDegree(int cameraRotation, int localRotation)
 	{
@@ -1011,7 +988,7 @@ public class CallLogic
 
 	/**
 	 * 呼叫保持
-	 * 
+	 *
 	 * @return 组件调用结果 返回 0成功 非0失败
 	 */
 	public boolean holdcall()
@@ -1037,7 +1014,7 @@ public class CallLogic
 
 	/**
 	 * 方法名称：resume 方法描述：恢复通话
-	 * 
+	 *
 	 * @return 组件调用结果
 	 */
 	public boolean resume()
@@ -1056,11 +1033,9 @@ public class CallLogic
 
 	/**
 	 * 辅流媒体控制
-	 * 
-	 * @param mediaModule
-	 *            控制模块
-	 * @param mediaSwitch
-	 *            控制开关
+	 *
+	 * @param mediaModule 控制模块
+	 * @param mediaSwitch 控制开关
 	 */
 	public boolean dataControl(int mediaModule, int mediaSwitch)
 	{
@@ -1115,11 +1090,9 @@ public class CallLogic
 
 	/**
 	 * 静音/关闭静音
-	 * 
-	 * @param mute
-	 *            true:开启静音 false:关闭静音
-	 * @param type
-	 *            麦克风静音为0 扬声器为1
+	 *
+	 * @param mute true:开启静音 false:关闭静音
+	 * @param type 麦克风静音为0 扬声器为1
 	 * @return 静音是否成功
 	 */
 	public boolean mute(boolean mute, int type)
@@ -1142,7 +1115,7 @@ public class CallLogic
 
 	/**
 	 * 切换窗口
-	 * 
+	 *
 	 * @return 成功或者失败
 	 */
 	public boolean modifyRender(boolean isModifyBfcpRender)
@@ -1164,11 +1137,9 @@ public class CallLogic
 
 	/**
 	 * render控制
-	 * 
-	 * @param witch
-	 *            本远端
-	 * @param isOpen
-	 *            true开启
+	 *
+	 * @param witch  本远端
+	 * @param isOpen true开启
 	 */
 	public boolean controlRenderVideo(int renderModule, boolean isStart)
 	{
@@ -1178,11 +1149,9 @@ public class CallLogic
 
 	/**
 	 * 主流媒体控制
-	 * 
-	 * @param mediaModule
-	 *            控制模块
-	 * @param mediaSwitch
-	 *            控制开关
+	 *
+	 * @param mediaModule 控制模块
+	 * @param mediaSwitch 控制开关
 	 */
 	public boolean videoControl(int mediaModule, int mediaSwitch)
 	{
@@ -1195,10 +1164,9 @@ public class CallLogic
 
 	/**
 	 * 关闭本地摄像头
-	 * 
+	 *
+	 * @param isCloseAction true表示关闭本地摄像头操作，false表示打开操作
 	 * @return 执行完成
-	 * @param isCloseAction
-	 *            true表示关闭本地摄像头操作，false表示打开操作
 	 */
 	public boolean localCameraControl(boolean isCloseAction)
 	{
@@ -1225,9 +1193,8 @@ public class CallLogic
 
 	/**
 	 * 开启或者关闭主流采集
-	 * 
-	 * @param isStart
-	 *            开启或者关闭
+	 *
+	 * @param isStart 开启或者关闭
 	 */
 	public boolean controlVideoCapture(boolean isStart)
 	{
@@ -1237,9 +1204,8 @@ public class CallLogic
 
 	/**
 	 * 描述：本地切换摄像头（前后摄像头切换）
-	 * 
-	 * @param caps
-	 *            本远端参数
+	 *
+	 * @param caps 本远端参数
 	 * @return 切换成功，失败
 	 */
 	public boolean switchCamera(VideoCaps caps)
@@ -1266,7 +1232,7 @@ public class CallLogic
 
 	/**
 	 * 启动音频媒体通道
-	 * 
+	 *
 	 * @return 是否成功
 	 */
 	public boolean startAudioChannel()
@@ -1285,7 +1251,7 @@ public class CallLogic
 
 	/**
 	 * 停止音频媒体通道
-	 * 
+	 *
 	 * @return 是否成功
 	 */
 	public boolean stopAudioChannel()
@@ -1304,7 +1270,7 @@ public class CallLogic
 
 	/**
 	 * 请求 开始BFCP
-	 * 
+	 *
 	 * @return 是否执行完成
 	 */
 	public boolean startBFCP()
@@ -1321,7 +1287,7 @@ public class CallLogic
 
 	/**
 	 * 请求停止BFCP
-	 * 
+	 *
 	 * @return 执行是否完成
 	 */
 	public boolean stopBFCP()
@@ -1342,9 +1308,8 @@ public class CallLogic
 
 	/**
 	 * 来电通知 4102
-	 * 
-	 * @param callsession
-	 *            会话对象
+	 *
+	 * @param callsession 会话对象
 	 */
 	public void processCallNtfComing(SessionBean session)
 	{
@@ -1430,9 +1395,8 @@ public class CallLogic
 
 	/**
 	 * 振铃通知
-	 * 
-	 * @param callSession
-	 *            会话对象
+	 *
+	 * @param callSession 会话对象
 	 */
 	public void processCallNtfRinging(SessionBean session)
 	{
@@ -1478,9 +1442,8 @@ public class CallLogic
 
 	/**
 	 * 通话挂断通知
-	 * 
-	 * @param callsession
-	 *            会话对象
+	 *
+	 * @param callsession 会话对象
 	 */
 	public void processCallNtfClosed(SessionBean session)
 	{
@@ -1541,9 +1504,8 @@ public class CallLogic
 
 	/**
 	 * 会话变更通知 4112
-	 * 
-	 * @param sessionBean
-	 *            会话数据
+	 *
+	 * @param sessionBean 会话数据
 	 */
 	public void processCallNtfModifyAlert(SessionBean session)
 	{
@@ -1584,9 +1546,8 @@ public class CallLogic
 
 	/**
 	 * 会话变更 4113
-	 * 
-	 * @param mCallSession
-	 *            会话
+	 *
+	 * @param mCallSession 会话
 	 */
 	public void processCallNtfModified(final SessionBean currentCall)
 	{
@@ -1689,11 +1650,9 @@ public class CallLogic
 
 	/**
 	 * 协商结果处理 将BFCP重协商结果上报界面层
-	 * 
-	 * @param callid
-	 *            呼叫唯一标识
-	 * @param ConsultRet
-	 *            协商结果/重协商结果
+	 *
+	 * @param callId     呼叫唯一标识
+	 * @param consultRet 协商结果/重协商结果
 	 */
 	public void processBFCPConsultRet(String callId, boolean consultRet)
 	{
@@ -1717,9 +1676,8 @@ public class CallLogic
 
 	/**
 	 * BFCP接收开始
-	 * 
-	 * @param callid
-	 *            呼叫唯一标识
+	 *
+	 * @param callid 呼叫唯一标识
 	 */
 	public void processBFCPAccptedStart(String callid)
 	{
@@ -1736,9 +1694,8 @@ public class CallLogic
 
 	/**
 	 * BFCP接收结束
-	 * 
-	 * @param callid
-	 *            呼叫唯一标识
+	 *
+	 * @param callid 呼叫唯一标识
 	 */
 	public void processBFCPStoped(String callid)
 	{
@@ -1774,9 +1731,8 @@ public class CallLogic
 
 	/**
 	 * 用于清除缓存中的多路Callrecord（主被动挂断后）
-	 * 
-	 * @param callid
-	 *            会话ID
+	 *
+	 * @param callid 会话ID
 	 */
 	private void delRecordMapBycallID(String callid)
 	{
@@ -1786,9 +1742,8 @@ public class CallLogic
 
 	/**
 	 * 删除缓存的与Callid对应的数据库记录ID
-	 * 
-	 * @param callid
-	 *            会话ID
+	 *
+	 * @param callid 会话ID
 	 */
 	private void delCallRecordMapByCallID(String callid)
 	{
@@ -1800,9 +1755,8 @@ public class CallLogic
 
 	/**
 	 * 删除缓存的CallSessionMap中的会话
-	 * 
-	 * @param callid
-	 *            会话ID
+	 *
+	 * @param callid 会话ID
 	 */
 	private void delCallSessionMapByCallID(String callid)
 	{
@@ -1864,40 +1818,41 @@ public class CallLogic
 			LogUtil.d(TAG, "refreshAudioRoute route: " + route);
 
 			// 获取音频路由只能获取到是听筒模式还是扬声器模式
-			switch (route) {
-			// 听筒模式（包含蓝牙>有线耳机>听筒）
-			case EarpieceMode.TYPE_AUTO:
-				// 获取到当前为听筒
-				break;
+			switch (route)
+			{
+				// 听筒模式（包含蓝牙>有线耳机>听筒）
+				case EarpieceMode.TYPE_AUTO:
+					// 获取到当前为听筒
+					break;
 
-			// 听筒
-			case EarpieceMode.TYPE_TELRECEIVER:
-				// 手机下，有听筒
-				if (LayoutUtil.isPhone())
-				{
-					// 把听筒放到第一位，表示当前使用听筒
-					modSupportAudioRouteList(EarpieceMode.TYPE_TELRECEIVER);
-				}
-				// Pad下听筒为扬声器
-				else
-				{
+				// 听筒
+				case EarpieceMode.TYPE_TELRECEIVER:
+					// 手机下，有听筒
+					if (LayoutUtil.isPhone())
+					{
+						// 把听筒放到第一位，表示当前使用听筒
+						modSupportAudioRouteList(EarpieceMode.TYPE_TELRECEIVER);
+					}
+					// Pad下听筒为扬声器
+					else
+					{
+						// 把扬声器放到第一位，表示当前使用扬声器
+						modSupportAudioRouteList(EarpieceMode.TYPE_LOUD_SPEAKER);
+					}
+					break;
+				// 扬声器模式
+				case EarpieceMode.TYPE_LOUD_SPEAKER:
 					// 把扬声器放到第一位，表示当前使用扬声器
 					modSupportAudioRouteList(EarpieceMode.TYPE_LOUD_SPEAKER);
-				}
-				break;
-			// 扬声器模式
-			case EarpieceMode.TYPE_LOUD_SPEAKER:
-				// 把扬声器放到第一位，表示当前使用扬声器
-				modSupportAudioRouteList(EarpieceMode.TYPE_LOUD_SPEAKER);
-				break;
-			// 蓝牙
-			case EarpieceMode.TYPE_BLUETOOTH:
-				// 有线耳机
-			case EarpieceMode.TYPE_EARPHONE:
-				modSupportAudioRouteList(route);
-				break;
-			default:
-				break;
+					break;
+				// 蓝牙
+				case EarpieceMode.TYPE_BLUETOOTH:
+					// 有线耳机
+				case EarpieceMode.TYPE_EARPHONE:
+					modSupportAudioRouteList(route);
+					break;
+				default:
+					break;
 			}
 
 			// 如果非扬声器模式下， 即听筒模式下，按蓝牙>有线耳机>听筒的顺序排序
@@ -1935,7 +1890,7 @@ public class CallLogic
 
 	/**
 	 * 听筒和扬声器切换
-	 * 
+	 *
 	 * @return 执行结果 true 执行成功 false 执行失败
 	 */
 	public boolean changeAudioRoute()
@@ -2009,9 +1964,8 @@ public class CallLogic
 
 	/**
 	 * 解析底层返回值（只用于判断底层是否执行完成）
-	 * 
-	 * @param retStr
-	 *            执行底层命令返回string值，
+	 *
+	 * @param retStr 执行底层命令返回string值，
 	 * @return 是否为真
 	 */
 	private boolean parseRet(String retStr)
@@ -2078,9 +2032,8 @@ public class CallLogic
 
 	/**
 	 * 删除保持中的呼叫
-	 * 
-	 * @param callid
-	 *            会话标识
+	 *
+	 * @param callid 会话标识
 	 */
 	private boolean closeInnerCall(String callid)
 	{
@@ -2193,11 +2146,9 @@ public class CallLogic
 
 	/**
 	 * bfcprender控制
-	 * 
-	 * @param witch
-	 *            要切换的render
-	 * @param isOpen
-	 *            true开启
+	 *
+	 * @param renderModule  要切换的render
+	 * @param isStart true开启
 	 */
 	public boolean controlRenderData(int renderModule, boolean isStart)
 	{
@@ -2355,5 +2306,4 @@ public class CallLogic
 		LogUtil.i(TAG, "setFastBandwidth leave.");
 		return true;
 	}
-
 }

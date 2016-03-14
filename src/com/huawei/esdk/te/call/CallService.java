@@ -15,15 +15,15 @@
 
 package com.huawei.esdk.te.call;
 
-import java.util.List;
-
-import object.StreamInfo;
-import android.R.integer;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.huawei.esdk.te.util.LogUtil;
 import com.huawei.esdk.te.video.VideoHandler;
+
+import java.util.List;
+
+import object.StreamInfo;
 
 public class CallService
 {
@@ -39,8 +39,8 @@ public class CallService
 	public void registerNotification(CallNotification listener)
 	{
 		LogUtil.in();
-		// LogUtil.log4Android("", TAG + "." + "registerNotification", "", "",
-		// "", "", "", "", listener.toString());
+//		 LogUtil.log4Android("", TAG + "." + "registerNotification", "", "",
+//		 "", "", "", "", listener.toString());
 		LogUtil.i(TAG, "registerNotification()");
 		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().registerNotification(listener);
@@ -61,13 +61,10 @@ public class CallService
 
 	/**
 	 * 发起呼叫
-	 * 
-	 * @param calleeNumber
-	 *            被叫号码
-	 * @param domain
-	 *            域，暂时无用，可传空
-	 * @param isVideoCall
-	 *            是否视频通话
+	 *
+	 * @param calleeNumber 被叫号码
+	 * @param domain       域，暂时无用，可传空
+	 * @param isVideoCall  是否视频通话
 	 * @return CallErrorCode 成功："0" 失败：CallErrorCode.isFail(callCodeString)为true
 	 */
 	public String dialCall(String calleeNumber, String domain, boolean isVideoCall)
@@ -87,11 +84,9 @@ public class CallService
 
 	/**
 	 * 接听呼叫，接听一个呼叫，包括音，视频呼叫，返回接听是否成功
-	 * 
-	 * @param callId
-	 *            接听会话的唯一标识callId
-	 * @param isVideo
-	 *            是否需要接入视频， 普通通话传入false
+	 *
+	 * @param callId  接听会话的唯一标识callId
+	 * @param isVideo 是否需要接入视频， 普通通话传入false
 	 * @return true表示成功，false表示失败
 	 */
 	public boolean callAnswer(String callId, boolean isVideo)
@@ -109,9 +104,8 @@ public class CallService
 
 	/**
 	 * 挂断来电呼叫
-	 * 
-	 * @param callId
-	 *            来电的callId
+	 *
+	 * @param callId 来电的callId
 	 * @return 执行拒绝呼叫结果， true 为成功
 	 */
 	public boolean rejectCall(String callId)
@@ -128,7 +122,7 @@ public class CallService
 
 	/**
 	 * 挂断呼叫
-	 * 
+	 *
 	 * @return currentCallId是否为空 - 执行是否成功
 	 */
 	public synchronized boolean closeCall()
@@ -158,9 +152,8 @@ public class CallService
 
 	/**
 	 * 把本地视频画面添加到界面布局中
-	 * 
-	 * @param preViewContain
-	 *            包含本地视频render
+	 *
+	 * @param preViewContain 包含本地视频render
 	 */
 	public void openLocalPreview(ViewGroup preViewContain)
 	{
@@ -180,13 +173,10 @@ public class CallService
 
 	/**
 	 * 把视频画面填加到界面布局中
-	 * 
-	 * @param localViewContain
-	 *            包含本地render
-	 * @param remoteViewContain
-	 *            包含远端render
-	 * @param isLocal
-	 *            true 本地最上面 false远端最上面
+	 *
+	 * @param localViewContain  包含本地render
+	 * @param remoteViewContain 包含远端render
+	 * @param isLocal           true 本地最上面 false远端最上面
 	 */
 	public void openCallVideo(ViewGroup localViewContain, ViewGroup remoteViewContain, boolean isLocal)
 	{
@@ -210,10 +200,9 @@ public class CallService
 
 	/**
 	 * 视频通话中本地摄像头开关接口
-	 * 
+	 *
+	 * @param isCloseAction true表示关闭本地摄像头操作，false表示打开操作
 	 * @return 执行完成
-	 * @param isCloseAction
-	 *            true表示关闭本地摄像头操作，false表示打开操作
 	 */
 	public boolean localCameraControl(boolean isCloseAction)
 	{
@@ -244,7 +233,7 @@ public class CallService
 
 	/**
 	 * 接受视频升级
-	 * 
+	 *
 	 * @return 执行结果 true 为执行成功 false 执行失败
 	 */
 	public boolean agreeUpgradeVideo()
@@ -260,7 +249,7 @@ public class CallService
 
 	/**
 	 * 拒绝视频升级
-	 * 
+	 *
 	 * @return true / false 执行结果 true 执行成功 false 执行失败
 	 */
 	public boolean rejectUpgradeVideo()
@@ -276,7 +265,7 @@ public class CallService
 
 	/**
 	 * 音频通话转视频通话
-	 * 
+	 *
 	 * @return 执行结果 true 执行成功 false 执行失败
 	 */
 	public boolean upgradeVideo()
@@ -306,9 +295,8 @@ public class CallService
 
 	/**
 	 * 二次拨号
-	 * 
-	 * @param code
-	 *            号码
+	 *
+	 * @param code 号码
 	 */
 	public boolean sendDTMF(String code)
 	{
@@ -324,11 +312,9 @@ public class CallService
 
 	/**
 	 * 静音本地麦克风
-	 * 
-	 * @param isRefer
-	 *            是否会议中转移 true: 会议中转移， false：非会议中转移，对设备原来的静音状态取反。
-	 * @param isMute
-	 *            是否静音 true: 静音， false：取消静音
+	 *
+	 * @param isRefer 是否会议中转移 true: 会议中转移， false：非会议中转移，对设备原来的静音状态取反。
+	 * @param isMute  是否静音 true: 静音， false：取消静音
 	 */
 	public boolean setLocalMute(boolean isRefer, boolean isMute)
 	{
@@ -374,11 +360,9 @@ public class CallService
 
 	/**
 	 * 摄像头旋转角度设置
-	 * 
-	 * @param cameraRotation
-	 *            设置摄像头采集角度（视频捕获角度）
-	 * @param localRotation
-	 *            设置本地图像显示角度
+	 *
+	 * @param cameraRotation 设置摄像头采集角度（视频捕获角度）
+	 * @param localRotation  设置本地图像显示角度
 	 */
 	public void setCameraDegree(int cameraRotation, int localRotation)
 	{
@@ -455,8 +439,8 @@ public class CallService
 	{
 		LogUtil.in();
 		StreamInfo ret = CallLogic.getInstance().getMediaInfo();
-		if(null != ret)
-		LogUtil.out(ret.toString(), "");
+		if (null != ret)
+			LogUtil.out(ret.toString(), "");
 		return ret;
 	}
 
@@ -471,6 +455,7 @@ public class CallService
 		return ret;
 	}
 	//TO test commit on Android Studio .
+
 	/**
 	 * 获取当前CallID
 	 */
