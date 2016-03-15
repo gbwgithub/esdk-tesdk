@@ -44,8 +44,7 @@ public class CallService
 		LogUtil.i(TAG, "registerNotification()");
 		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().registerNotification(listener);
-		LogUtil.out("void", "listener -> " + listener);
-		LogUtil.out("", "listener -> " + listener);
+		LogUtil.out("", "listener=" + listener);
 	}
 
 	public void unregisterNotification(CallNotification listener)
@@ -56,7 +55,7 @@ public class CallService
 		LogUtil.i(TAG, "unregisterNotification()");
 		LogUtil.i(TAG, "CallNotification listener -> " + listener);
 		IpCallNotificationImpl.getInstance().unRegisterNotification(listener);
-		LogUtil.out("", "listener -> " + listener);
+		LogUtil.out("", "listener=" + listener);
 	}
 
 	/**
@@ -78,7 +77,7 @@ public class CallService
 		LogUtil.i(TAG, "domain -> " + domain);
 		LogUtil.i(TAG, "isVideoCall -> " + isVideoCall);
 		String ret = CallLogic.getInstance().dialCall(calleeNumber, domain, isVideoCall);
-		LogUtil.out(ret, "calleeNumber -> " + calleeNumber + "  isVideoCall -> " + isVideoCall);
+		LogUtil.out(ret, "calleeNumber=" + calleeNumber + "  isVideoCall=" + isVideoCall);
 		return ret;
 	}
 
@@ -98,7 +97,7 @@ public class CallService
 		LogUtil.i(TAG, "callId -> " + callId);
 		LogUtil.i(TAG, "isVideo -> " + isVideo);
 		boolean ret = CallLogic.getInstance().callAnswer(callId, isVideo);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "callId -> " + callId + "  isVideo -> " + isVideo);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "callId=" + callId + "  isVideo=" + isVideo);
 		return ret;
 	}
 
@@ -116,7 +115,7 @@ public class CallService
 		LogUtil.i(TAG, "rejectCall()");
 		LogUtil.i(TAG, "callId -> " + callId);
 		boolean ret = CallLogic.getInstance().rejectCall(callId);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "callId -> " + callId);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "callId=" + callId);
 		return ret;
 	}
 
@@ -146,7 +145,7 @@ public class CallService
 		LogUtil.i(TAG, "localVideoView -> " + localVideoView);
 		LogUtil.i(TAG, "remoteVideoView -> " + remoteVideoView);
 		boolean ret = CallLogic.getInstance().openBFCPReceive(localVideoView, remoteVideoView);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "localVideoView -> " + localVideoView + "  remoteVideoView -> " + remoteVideoView);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "localVideoView=" + localVideoView + "  remoteVideoView=" + remoteVideoView);
 		return ret;
 	}
 
@@ -168,7 +167,7 @@ public class CallService
 			VideoHandler.getIns().initCallVideo();
 		}
 		CallLogic.getInstance().addLocalRenderToContain(preViewContain);
-		LogUtil.out("", "preViewContain -> " + preViewContain);
+		LogUtil.out("", "preViewContain=" + preViewContain);
 	}
 
 	/**
@@ -195,7 +194,7 @@ public class CallService
 			// 只有第一次进入视频通话的时候才去添加view，如果是视频参数更改之类的就不去做此操作
 			VideoHandler.getIns().addRenderToContain(localViewContain, remoteViewContain, isLocal);
 		}
-		LogUtil.out("", "localViewContain -> " + localViewContain + "  remoteViewContain -> " + remoteViewContain + "  isLocal -> " + isLocal);
+		LogUtil.out("", "localViewContain=" + localViewContain + "  remoteViewContain=" + remoteViewContain + "  isLocal=" + isLocal);
 	}
 
 	/**
@@ -213,7 +212,7 @@ public class CallService
 		LogUtil.i(TAG, "isCloseAction -> " + isCloseAction);
 		CallLogic.getInstance().setUserCloseLocalCamera(isCloseAction);
 		boolean ret = CallLogic.getInstance().localCameraControl(isCloseAction);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "isCloseAction -> " + isCloseAction);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "isCloseAction=" + isCloseAction);
 		return ret;
 	}
 
@@ -306,7 +305,7 @@ public class CallService
 		LogUtil.i(TAG, "sendDTMF()");
 		LogUtil.i(TAG, "code -> " + code);
 		boolean ret = CallLogic.getInstance().reDial(code);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "code -> " + code);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "code=" + code);
 		return ret;
 	}
 
@@ -325,7 +324,7 @@ public class CallService
 		LogUtil.i(TAG, "isRefer -> " + isRefer);
 		LogUtil.i(TAG, "isMute -> " + isMute);
 		boolean ret = CallLogic.getInstance().setLocalMute(isRefer, isMute);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "isMute -> " + isMute);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "isMute=" + isMute);
 		return ret;
 	}
 
@@ -340,7 +339,7 @@ public class CallService
 		LogUtil.i(TAG, "oratorMute()");
 		LogUtil.i(TAG, "isMute -> " + isMute);
 		boolean ret = CallLogic.getInstance().oratorMute(isMute);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "isMute -> " + isMute);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "isMute=" + isMute);
 		return ret;
 	}
 
@@ -375,7 +374,7 @@ public class CallService
 		LogUtil.i(TAG, "cameraRotation -> " + cameraRotation);
 		LogUtil.i(TAG, "localRotation -> " + localRotation);
 		CallLogic.getInstance().setCameraDegree(cameraRotation, localRotation);
-		LogUtil.out("", "cameraRotation -> " + cameraRotation + "  localRotation -> " + localRotation);
+		LogUtil.out("", "cameraRotation=" + cameraRotation + "  localRotation=" + localRotation);
 	}
 
 	/**
@@ -389,7 +388,7 @@ public class CallService
 		LogUtil.i(TAG, "setBandwidth()");
 		LogUtil.i(TAG, "bw -> " + bw);
 		boolean ret = CallLogic.getInstance().setFastBandwidth(bw);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "cameraRotation -> " + "bw -> " + bw);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "cameraRotation=" + "bw=" + bw);
 		return ret;
 	}
 
@@ -404,7 +403,7 @@ public class CallService
 		LogUtil.i(TAG, "setVideoMode()");
 		LogUtil.i(TAG, "videoMode -> " + videoMode);
 		boolean ret = VideoHandler.getIns().setVideoMode(videoMode);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "cameraRotation -> " + "videoMode -> " + videoMode);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "cameraRotation=" + "videoMode=" + videoMode);
 		return ret;
 	}
 
@@ -417,7 +416,7 @@ public class CallService
 		LogUtil.i(TAG, "setEncryptMode()");
 		LogUtil.i(TAG, "encryptMode -> " + encryptMode);
 		boolean ret = VideoHandler.getIns().setEncryptMode(encryptMode);
-		LogUtil.out(Boolean.valueOf(ret).toString(), "encryptMode -> " + encryptMode);
+		LogUtil.out(Boolean.valueOf(ret).toString(), "encryptMode=" + encryptMode);
 		return ret;
 	}
 

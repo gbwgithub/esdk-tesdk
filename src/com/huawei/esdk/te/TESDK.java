@@ -53,7 +53,6 @@ import com.huawei.voip.CallManager.State;
 import com.huawei.voip.data.LoginInfo;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -93,22 +92,26 @@ public class TESDK
 		instance = new TESDK(app);
 		System.loadLibrary("Log4Android");
 		Log4Android.setContext(app);
-		LogUtil.d(TAG, "Log4Android isWIFIConnect -> " + Log4Android.isWIFIConnect());
 
-		InputStream is = app.getClass().getResourceAsStream("/com/huawei/esdk/log4Android/eSDKClientLogCfg.ini");
-		String fileContents = new String(Log4Android.InputStreamToByte(is));
-
-		LogUtil.d(TAG, "Log4Android fileContents -> " + fileContents);
+//		InputStream is = app.getClass().getResourceAsStream("/com/huawei/esdk/log4Android/eSDKClientLogCfg.ini");
+//		String fileContents = new String(Log4Android.InputStreamToByte(is));
+//		LogUtil.d(TAG, "Log4Android fileContents -> " + fileContents);
+		
 		// 日志初始化
-		int[] logLevel = { 0, 0, 3 };
-		LogUtil.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, fileContents, logLevel, "/sdcard/TEMobile/log"));
+		int[] logLevel = {0, 0, 0};
+		LogUtil.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, "", logLevel, "/sdcard/TEMobile/log"));
+		int[] sizes = {10240,10240,10240};
+		int[] nums = {10,10,10};
+		String serverPath = "esdk-log.huawei.com:9086";
+		String logUploadUrl = "/esdkom/log/upload";
+		Log4Android.getInstance().setLogProperty(LogUtil.product, sizes, nums, serverPath, logUploadUrl);
 		Log4Android.getInstance().setCallBackMethod();
-		Log4Android.getInstance().setSendLogStrategy(0, 2, "172.22.9.38:9086");
+		Log4Android.getInstance().setSendLogStrategy(0, 2, serverPath);
 		Log4Android.getInstance().initMobileLog(LogUtil.product);
 
 		// LogUtil.log4Android("", TAG + "." + "initSDK", "", "", "", "", "",
 		// "", app.toString());
-		LogUtil.out("", "app -> " + app.toString());
+		LogUtil.out("", "app=" + app.toString());
 
 		// LogUtil.d(TAG, "new Throwable().getStackTrace().length -> " + new
 		// Throwable().getStackTrace().length);
@@ -231,7 +234,7 @@ public class TESDK
 	{
 		LogUtil.d(TAG, "TESDK construct");
 		application = app;
-		debugSwitch = false;
+		debugSwitch = true;
 		logPath = application.getFilesDir().getPath() + SDK_LOG_DIR;
 		LogUtil.d(TAG, "init logPath -> " + logPath);
 
@@ -281,11 +284,9 @@ public class TESDK
 
 	/**
 	 * 设置记录Log文件开关及路径
-	 * 
-	 * @param debugSwitch
-	 *            是否记录Log文件
-	 * @param path
-	 *            Log文件路径
+	 *
+	 * @param debugSwitch 是否记录Log文件
+	 * @param path        Log文件路径
 	 */
 	public void setLogPath(boolean debugSwitch, String path)
 	{
@@ -299,7 +300,7 @@ public class TESDK
 		}
 		// 执行设置Log开关
 		logSwitch();
-		LogUtil.out("", "debugSwitch -> " + debugSwitch + "  path" + path);
+		LogUtil.out("", "debugSwitch=" + debugSwitch + "  path" + path);
 	}
 
 	public String getLogPath()
@@ -309,7 +310,7 @@ public class TESDK
 
 	/**
 	 * Function: 写日志总开关
-	 * 
+	 *
 	 * @return boolean true/ false
 	 */
 	private boolean logSwitch()
@@ -337,11 +338,9 @@ public class TESDK
 
 	/**
 	 * Logcat日志写入文件开关
-	 * 
-	 * @param debugSwitch
-	 *            是否写MAA日志
-	 * @param logPath
-	 *            日志路径 （打开，和关闭的路径应该一致）
+	 *
+	 * @param debugSwitch 是否写MAA日志
+	 * @param logPath     日志路径 （打开，和关闭的路径应该一致）
 	 */
 	private void saveLogcat(boolean debugSwitch, String logPath)
 	{
@@ -384,13 +383,10 @@ public class TESDK
 
 	/**
 	 * 方法名称：callWhenServiceConnected 方法描述：绑定服务后回调
-	 * 
-	 * @param target
-	 *            输入参数
-	 * @param callback
-	 *            输入参数
-	 * @param isAutoLogin
-	 *            输入参数 返回类型：void
+	 *
+	 * @param target      输入参数
+	 * @param callback    输入参数
+	 * @param isAutoLogin 输入参数 返回类型：void
 	 */
 	private void callWhenServiceConnected(Handler target, Runnable callback, boolean isAutoLogin)
 	{
@@ -421,7 +417,7 @@ public class TESDK
 
 	/**
 	 * Function: 判断当前的Service 是否已经绑定上
-	 * 
+	 *
 	 * @return boolean
 	 */
 	private boolean serviceConnected()
@@ -553,7 +549,7 @@ public class TESDK
 		if (!DeviceManager.isNetworkAvailable(application))
 		{
 			LogUtil.e(TAG, "网络已断开");
-			LogUtil.out("false", "loginParameter -> " + loginParameter);
+			LogUtil.out("false", "loginParameter=" + loginParameter);
 			return false;
 		}
 
@@ -577,7 +573,7 @@ public class TESDK
 				}, false);
 			}
 		}).run();
-		LogUtil.out("true", "loginParameter -> " + loginParameter);
+		LogUtil.out("true", "loginParameter=" + loginParameter);
 		return true;
 	}
 
@@ -796,6 +792,7 @@ public class TESDK
 				LogUtil.d(TAG, "ACTION_SCREEN_ON");
 				if (null == CallLogic.getInstance())
 				{
+					LogUtil.d(TAG, "ACTION_SCREEN_ON but CallLogic is null");
 					return;
 				}
 				if (CallStatus.STATUS_VIDEOINIT == CallLogic.getInstance().getVoipStatus()
@@ -806,6 +803,7 @@ public class TESDK
 					{
 						if (!CallLogic.getInstance().isUserCloseLocalCamera())
 						{
+
 							Executors.newSingleThreadExecutor().execute(new BackFromBackground());
 						} else
 						{
@@ -818,21 +816,107 @@ public class TESDK
 				LogUtil.d(TAG, "ACTION_SCREEN_OFF");
 				if (null == CallLogic.getInstance())
 				{
+					LogUtil.d(TAG, "ACTION_SCREEN_OFF but CallLogic is null");
 					return;
 				}
 				if (CallStatus.STATUS_VIDEOINIT == CallLogic.getInstance().getVoipStatus()
 						| CallStatus.STATUS_VIDEOING == CallLogic.getInstance().getVoipStatus())
 				{
-					LogUtil.d(TAG, "ACTION_SCREEN_OFF & voidoing");
+					LogUtil.d(TAG, "ACTION_SCREEN_OFF & voideoing");
+					LogUtil.d(TAG, "VoipStatus -> " + CallLogic.getInstance().getVoipStatus());
 					if (null != LocalHideRenderServer.getInstance())
 					{
+						LogUtil.d(TAG, "ACTION_SCREEN_OFF & doInBackground");
 						LocalHideRenderServer.getInstance().doInBackground();
+					} else {
+						LogUtil.d(TAG, "ACTION_SCREEN_OFF & videoing but LocalHideRenderServer is null");
 					}
+				}
+				else {
+					LogUtil.d(TAG, "ACTION_SCREEN_OFF & not voidoing");
+					LogUtil.d(TAG, "VoipStatus -> " + CallLogic.getInstance().getVoipStatus());
 				}
 			}
 		}
 	}
 
+//	private class ScreenActionReceiver extends BroadcastReceiver
+//	{
+//		@Override
+//		public void onReceive(Context context, Intent intent)
+//		{
+//			final Intent intent1 = intent;
+//			new Thread(new ReceiveRunnable(intent)).run();
+//		}
+//	}
+//
+//	private class ReceiveRunnable implements Runnable{
+//		
+//		private Intent intent;
+//		
+//		ReceiveRunnable(Intent intent){
+//			this.intent = intent;
+//		}
+//		
+//		@Override
+//		public void run()
+//		{
+//			LogUtil.d(TAG, "in new thread");
+//			String action = intent.getAction();
+//			if (action.equals(Intent.ACTION_SCREEN_ON))
+//			{
+//				LogUtil.d(TAG, "ACTION_SCREEN_ON");
+//				if (null == CallLogic.getInstance())
+//				{
+//					LogUtil.d(TAG, "ACTION_SCREEN_ON but CallLogic is null");
+//					return;
+//				}
+//				if (CallStatus.STATUS_VIDEOINIT == CallLogic.getInstance().getVoipStatus()
+//						| CallStatus.STATUS_VIDEOING == CallLogic.getInstance().getVoipStatus())
+//				{
+//					LogUtil.d(TAG, "ACTION_SCREEN_ON & voidoing");
+//					if (null != LocalHideRenderServer.getInstance())
+//					{
+//						if (!CallLogic.getInstance().isUserCloseLocalCamera())
+//						{
+//
+//							Executors.newSingleThreadExecutor().execute(new BackFromBackground());
+//						} else
+//						{
+//							LocalHideRenderServer.getInstance().setBackground(false);
+//						}
+//					}
+//				}
+//			} else if (action.equals(Intent.ACTION_SCREEN_OFF))
+//			{
+//				LogUtil.d(TAG, "ACTION_SCREEN_OFF");
+//				if (null == CallLogic.getInstance())
+//				{
+//					LogUtil.d(TAG, "ACTION_SCREEN_OFF but CallLogic is null");
+//					return;
+//				}
+////				if (CallStatus.STATUS_VIDEOINIT == CallLogic.getInstance().getVoipStatus()
+////						| CallStatus.STATUS_VIDEOING == CallLogic.getInstance().getVoipStatus())
+////				{
+//				LogUtil.d(TAG, "ACTION_SCREEN_OFF & voideoing");
+//				LogUtil.d(TAG, "VoipStatus -> " + CallLogic.getInstance().getVoipStatus());
+//				if (null != LocalHideRenderServer.getInstance())
+//				{
+//					LogUtil.d(TAG, "ACTION_SCREEN_OFF & doInBackground");
+//					LocalHideRenderServer.getInstance().doInBackground();
+//				} else {
+//					LogUtil.d(TAG, "ACTION_SCREEN_OFF & videoing but LocalHideRenderServer is null");
+//				}
+////				}
+////				else {
+////					LogUtil.d(TAG, "ACTION_SCREEN_OFF & not voidoing");
+////					LogUtil.d(TAG, "VoipStatus -> " + CallLogic.getInstance().getVoipStatus());
+////				}
+//			}
+//		}
+//	}
+	
+	
 	/**
 	 * 后台切换内部类
 	 */
