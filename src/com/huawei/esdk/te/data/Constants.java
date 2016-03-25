@@ -1029,6 +1029,8 @@ public class Constants {
 		 */
 		int MSG_NOTIFY_CALLCLOSE = 211;
 
+		int MSG_LOGOUT = 2120;
+		
 		int MSG_LOGOUT_AND_REGISTE = 212;
 		/**
 		 * 主叫呼集结果

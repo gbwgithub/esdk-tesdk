@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.huawei.application.BaseApp;
@@ -45,6 +46,7 @@ import com.huawei.esdk.te.util.OrieantationUtil;
 import com.huawei.esdk.te.video.LocalHideRenderServer;
 import com.huawei.manager.DataManager;
 import com.huawei.module.SDKConfigParam;
+import com.huawei.service.HeartBeatConfig;
 import com.huawei.service.ServiceProxy;
 import com.huawei.service.eSpaceService;
 import com.huawei.utils.DeviceManager;
@@ -93,15 +95,11 @@ public class TESDK
 		System.loadLibrary("Log4Android");
 		Log4Android.setContext(app);
 
-//		InputStream is = app.getClass().getResourceAsStream("/com/huawei/esdk/log4Android/eSDKClientLogCfg.ini");
-//		String fileContents = new String(Log4Android.InputStreamToByte(is));
-//		LogUtil.d(TAG, "Log4Android fileContents -> " + fileContents);
-		
 		// 日志初始化
 		int[] logLevel = {0, 0, 0};
 		LogUtil.d(TAG, "logInit result -> " + Log4Android.getInstance().logInit(LogUtil.product, "", logLevel, "/sdcard/TEMobile/log"));
-		int[] sizes = {10240,10240,10240};
-		int[] nums = {10,10,10};
+		int[] sizes = {10240, 10240, 10240};
+		int[] nums = {10, 10, 10};
 		String serverPath = "esdk-log.huawei.com:9086";
 		String logUploadUrl = "/esdkom/log/upload";
 		Log4Android.getInstance().setLogProperty(LogUtil.product, sizes, nums, serverPath, logUploadUrl);
@@ -109,8 +107,6 @@ public class TESDK
 		Log4Android.getInstance().setSendLogStrategy(0, 2, serverPath);
 		Log4Android.getInstance().initMobileLog(LogUtil.product);
 
-		// LogUtil.log4Android("", TAG + "." + "initSDK", "", "", "", "", "",
-		// "", app.toString());
 		LogUtil.out("", "app=" + app.toString());
 
 		// LogUtil.d(TAG, "new Throwable().getStackTrace().length -> " + new
@@ -697,9 +693,10 @@ public class TESDK
 		@Override
 		public void onReceive(Context context, Intent intent)
 		{
+			BaseApp.getApp().removeStickyBroadcast(intent);
 			if (intent != null)
 			{
-				LogUtil.i(TAG, "onReceive broadcast ->" + intent);
+				LogUtil.w(TAG, "onReceive broadcast ->" + intent);
 
 				handlerBroadcastEvent(intent);
 			}
@@ -711,17 +708,36 @@ public class TESDK
 	 */
 	private void handlerBroadcastEvent(final Intent intent)
 	{
-		if (intent != null)
+		if (intent == null)
 		{
-			LogUtil.d(TAG, "handlerBroadcastEvent ->" + intent.getAction());
-			String action = intent.getAction();
-
-			if (CustomBroadcastConst.ACTION_CONNECT_TO_SERVER.equals(action))
-			{
-				LogUtil.d(TAG, "connect to server");
-				onConnectToServer(intent);
-			}
+			LogUtil.e(TAG, "handlerBroadcastEvent get intent -> null. So do noting.");
+			return;
 		}
+
+		LogUtil.d(TAG, "handlerBroadcastEvent ->" + intent.getAction());
+		String action = intent.getAction();
+
+		if (CustomBroadcastConst.ACTION_CONNECT_TO_SERVER.equals(action))
+		{
+			LogUtil.d(TAG, "connect to server");
+			onConnectToServer(intent);
+		} else if (CustomBroadcastConst.ACTION_KICKOFF_NOTIFY.equals(action))
+		{
+			actionKickOffNotify(intent);
+		}
+//		else if (CustomBroadcastConst.ACTION_LOGINOUT_SUCCESS.equals(action))
+//		{
+//			LogUtil.i(TAG, "Logout  Response  Success ");
+//			EventHandler.getApplicationHandler().removeCallbacks(
+//					logOutWaitRunnable);
+//			doWhenLogoutSuccess();
+//		} else if (BROADCAST_PATH.ACTION_LOGOUT.equals(action))
+//		{
+//			backToLogin();
+//		} else if (CustomBroadcastConst.DEVICE_NETSTATUSCHANGED_NOTIFY.equals(action))
+//		{
+//			actionNetStatusChangedNotify(intent);
+//		}
 	}
 
 	/**
@@ -729,13 +745,51 @@ public class TESDK
 	 */
 	private void registeBroadcast(Application app)
 	{
+		IntentFilter filter = getIntentFilter();
+
+		app.registerReceiver(mReceiver, filter);
+	}
+
+	/**
+	 * 生成需要注册的广播过滤器
+	 */
+	private IntentFilter getIntentFilter()
+	{
 		IntentFilter filter = new IntentFilter();
+		// 登录 连接服务器广播
 		filter.addAction(CustomBroadcastConst.ACTION_CONNECT_TO_SERVER);
-		// filter.addAction(CustomBroadcastConst.ACTION_LOGIN_RESPONSE);
+		// SIP被踢广播
+		filter.addAction(CustomBroadcastConst.ACTION_KICKOFF_NOTIFY); // 被踢
 		// filter.addAction(Constants.BROADCAST_PATH.ACTION_HOMEACTIVITY_SHOW);
 		// filter.addAction(CustomBroadcastConst.ACTION_SVN_AUTHENTICATION_RESPONSE);
 		// filter.addAction(HeartBeatConfig.ACTION_RECONNECT);
-		app.registerReceiver(mReceiver, filter);
+
+
+		filter.addAction(Intent.ACTION_LOCALE_CHANGED);// 语言变更 系统行为
+		filter.addAction(Intent.ACTION_NEW_OUTGOING_CALL);// 电话呼出  系统行为
+		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);//  声音路由变更   耳机 - 扬声器 
+		filter.addAction(CustomBroadcastConst.BACK_TO_LOGIN_VIEW); // UI_退会到登录页面
+		filter.addAction(Constants.BROADCAST_PATH.ACTION_RESTART);
+		filter.addAction(HeartBeatConfig.ACTION_RECONNECT);
+		filter.addAction(CustomBroadcastConst.ACTION_HB_TYPE_FRIEND_INVITE);
+		filter.addAction(CustomBroadcastConst.ACTION_REJECT_FRIEND_RESP);
+		filter.addAction(CustomBroadcastConst.ACTION_LOGIN_RESPONSE);
+		filter.addAction(CustomBroadcastConst.ACTION_CTD_CALL_RESPONSE);
+		filter.addAction(CustomBroadcastConst.ACTION_GETADDRESSBOOK_CONFIG);
+		// 添加广播 关机 （删除程序 ） （替换程序）
+		filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+		filter.addAction(Intent.ACTION_SHUTDOWN);
+		filter.addAction(Intent.ACTION_PACKAGE_RESTARTED);
+		filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+		// 添加广播
+		filter.addAction(CustomBroadcastConst.ACTION_VIEW_HEADPHOTO); // 头像
+		filter.addAction(CustomBroadcastConst.ACTION_BULLETIN_PUSH_NOTIFY); // 公告推送
+		filter.addAction(CustomBroadcastConst.ACTION_LOGINOUT_SUCCESS); // 注销成功
+
+		filter.addAction(CustomBroadcastConst.DEVICE_NETSTATUSCHANGED_NOTIFY);//网络变化
+		filter.addAction(CustomBroadcastConst.ACTION_TERMINATE_NOTIFY);
+		filter.addAction(Intent.ACTION_SCREEN_OFF);
+		return filter;
 	}
 
 	/**
@@ -756,6 +810,18 @@ public class TESDK
 		{
 			stopSDKService();
 		}
+	}
+
+	/**
+	 * 账号被踢回调
+	 */
+	private void actionKickOffNotify(Intent intent)
+	{
+		//得到被T的IP
+		String kickedIP = intent.getStringExtra("kickedIP");
+		
+		LogUtil.i(TAG, "be kicked forceCloseCall kickedIP -> " + kickedIP);
+		CallLogic.getInstance().forceCloseCall();
 	}
 
 	private void registerScreenActionReceiver(Context mContext)
@@ -828,11 +894,12 @@ public class TESDK
 					{
 						LogUtil.d(TAG, "ACTION_SCREEN_OFF & doInBackground");
 						LocalHideRenderServer.getInstance().doInBackground();
-					} else {
+					} else
+					{
 						LogUtil.d(TAG, "ACTION_SCREEN_OFF & videoing but LocalHideRenderServer is null");
 					}
-				}
-				else {
+				} else
+				{
 					LogUtil.d(TAG, "ACTION_SCREEN_OFF & not voidoing");
 					LogUtil.d(TAG, "VoipStatus -> " + CallLogic.getInstance().getVoipStatus());
 				}
@@ -915,8 +982,8 @@ public class TESDK
 //			}
 //		}
 //	}
-	
-	
+
+
 	/**
 	 * 后台切换内部类
 	 */
@@ -1131,4 +1198,6 @@ public class TESDK
 			this.loginInfo.setLicenseServer(licenseServer);
 		}
 	}
+
+
 }
